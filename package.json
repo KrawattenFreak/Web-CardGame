@@ -1,0 +1,24 @@
+{
+  "name": "web-cardgame",
+  "version": "1.0.0",
+  "description": "This is an inofficial version of Noname's CardGame in web.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KrawattenFreak/Web-CardGame.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KrawattenFreak/Web-CardGame/issues"
+  },
+  "homepage": "https://github.com/KrawattenFreak/Web-CardGame#readme",
+  "dependencies": {
+    "express": "^4.17.2",
+    "websocket": "^1.0.34"
+  }
+}
