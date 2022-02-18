@@ -1,4 +1,5 @@
 const http = require("http");
+const { connection } = require("websocket");
 const app = require("express")();
 app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"))
 
@@ -18,8 +19,45 @@ const wsServer = new websocketServer({
 wsServer.on("request", request => {
     //connect
     const connection = request.accept(null, request.origin);
-    connection.on("resume", () => console.log("opened!"))
-    connection.on("close", () => console.log("closed!"))
+    connection.on("resume", () => {
+        console.log("opened!")
+    })
+
+    connection.on("close", () => {
+        console.log("closed!");
+    
+    const clientId = getClientIdByConnection(connection);
+
+    
+    //HIER WILL ICH VERSUCHEN DIE CLIENT ID VON DEN CLIENTS GAME ZU LÖSCHEN!
+    for (i in games) {
+        
+        games[i].clients.forEach(d => {
+            if(d.clientId === clientId) {
+                console.log("Der Spieler " + d.username  + " aus dem Spiel " + games[i].id + " hat das Spiel verlassen.")
+
+                
+                const index = games[i].clients.indexOf(clientId);
+                games[i].clients.splice(index, 1); 
+                
+                const game = games[i];
+
+                const payLoad = {
+                    "method": "leave",
+                    "game": game
+                }
+    
+
+                //loop through all clients and tell them that people had joined
+                game.clients.forEach(c=> {
+                    clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                })
+            } 
+        });
+    }
+
+    })
+
     connection.on("message", message => {
 
         const result = JSON.parse(message.utf8Data)
@@ -52,22 +90,18 @@ wsServer.on("request", request => {
             const clientId = result.clientId;
             const gameId = result.gameId;
             const username = result.username;
-            
+
             const game = games[gameId];
 
             game.clients.push({
                 "clientId": clientId,
                 "username": username
             })
-            
-            
-            
-            
+
 
             const payLoad = {
                 "method": "join",
                 "game": game,
-                "users": game.clients
             }
 
 
@@ -76,17 +110,6 @@ wsServer.on("request", request => {
             game.clients.forEach(c=> {
                 clients[c.clientId].connection.send(JSON.stringify(payLoad));
             })
-
-            console.log(game.clients);
-
-
-
-            
-
-
-
-            
-
 
             
         }
@@ -114,3 +137,15 @@ const guid=()=> {
     const s4=()=> Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);     
     return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4() + s4() + s4()}`;
   }
+
+function getClientIdByConnection(connectionfunction) {
+    for (i in clients) {
+        if (clients[i].connection === connectionfunction) {
+            return i
+        }
+    } 
+    return null
+}
+
+
+

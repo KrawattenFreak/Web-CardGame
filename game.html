@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    
+        /*position: fixed; Floating above
+        
+        pointer-events: none;  Allow clicking trough the div */
+        
+    
+
+    .karten-section img, .cardPlace, .cardPlaceholder {
+        width: 140px;
+        height: 210px;
+    }
+
+
+    .cardPlace:hover {
+        cursor: grab;
+    }
+
+    .cardPlace {
+        border-color: grey;
+        border-width: 3px;
+        position: fixed;
+
+    }
+    
+    .karten-section {
+        display: flex;
+        flex-wrap: wrap;
+    }
+</style>
+
+<body>
+
+    <div class="karten-section">
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace0" class="cardPlace"> 
+                
+            </div>
+        </div>
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace1" class="cardPlace"> 
+                
+            </div>
+        </div>
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace2" class="cardPlace"> 
+                <img src="./pictures/gfx/DemoKarte_12.png">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace3" class="cardPlace"> 
+                <img src="./pictures/gfx/DemoKarte_13.png">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace4" class="cardPlace"> 
+
+            </div>
+        </div>
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace5" class="cardPlace"> 
+
+            </div>
+        </div>
+
+        <div class="cardPlaceholder">
+            <div id="cardPlace6" class="cardPlace"> 
+
+            </div>
+        </div>
+        
+    </div>
+
+
+</body>
+
+
+<script>
+
+    const anzahlCardFelder = 7;
+
+    const cards = [null, null, "DemoKarte_12", "DemoKarte_13", null, null, null];
+
+
+
+
+    //const isgrabbed = false;
+    const card0 = document.getElementById("cardPlace0");
+    const card1 = document.getElementById("cardPlace1");
+    const card2 = document.getElementById("cardPlace2");
+    const card3 = document.getElementById("cardPlace3");
+    const card4 = document.getElementById("cardPlace4");
+    const card5 = document.getElementById("cardPlace5");
+    const card6 = document.getElementById("cardPlace6");
+
+    let ausgewaelteCard = null;
+
+    card0.addEventListener("click", function () {
+        ausgewaelteCard = 0;
+        CardAngeklickt();
+    })
+
+    card1.addEventListener("click", function () {
+        ausgewaelteCard = 1;
+        CardAngeklickt();
+    })
+
+    card2.addEventListener("click", function () {
+        ausgewaelteCard = 2;
+        CardAngeklickt();
+    })
+
+    card3.addEventListener("click", function () {
+        ausgewaelteCard = 3;
+        CardAngeklickt();
+    })
+
+    card4.addEventListener("click", function () {
+        ausgewaelteCard = 4;
+        CardAngeklickt();
+    })
+
+    card5.addEventListener("click", function () {
+        ausgewaelteCard = 5;
+        CardAngeklickt();
+    })
+
+    card6.addEventListener("click", function () {
+        ausgewaelteCard = 6;
+        CardAngeklickt();
+    })
+
+    function CardAngeklickt() {
+        if(cards[ausgewaelteCard] != null) {
+        
+        } else {
+        console.log("Da ist keine Karte.");
+        }
+    }
+
+    
+
+
+
+    //card0.addEventListener("click", function () {
+    //    this.style.cursor = "grabbing";
+    //    document.addEventListener('mousemove', function(ev){
+    //        document.getElementById('cardPlace0').style.transform = 'translateY('+(ev.clientY-50)+'px)';
+    //        document.getElementById('cardPlace0').style.transform += 'translateX('+(ev.clientX-50)+'px)';            
+    //    })
+    //});
+
+
+
+</script>
+
+
+</html>

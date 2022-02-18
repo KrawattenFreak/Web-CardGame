@@ -6,8 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
+<style>
+    h1, p {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+</style>
+
+
 <body>
     <h1>Game</h1>
+
+    <p id = 'pgameid'></p>
+
     <button id = 'btnCreate'>New Game</button> <br><br>
     
     <input id = 'iptUsername' type="text" placeholder="Username">
@@ -15,10 +27,11 @@
     
 
     <button id = 'btnJoin'>Join</button>
+    <button id = 'startGame'> Start Game </button>
 
     <p>Mitspieler:</p>
 
-    <p id = "players"></p>
+    <div id = "players"></div>
 
     <script>
         //HTML elements
@@ -30,11 +43,11 @@
         const btnJoin = document.getElementById("btnJoin");
         const txtUsername = document.getElementById("iptUsername");
         const txtGameId = document.getElementById("iptGameId");
+        const divPlayers = document.getElementById("players");
+        const startGame = document.getElementById('startGame');
 
         //wiring events
         btnCreate.addEventListener("click", e => {
-            if (gameId === null)
-               gameId = txtGameId.value;
 
             const payLoad = {
                 "method": "create",
@@ -48,6 +61,7 @@
 
             const username = txtUsername.value;
             
+            gameId = txtGameId.value;
 
             const payload = {
                 "method": "join",
@@ -59,10 +73,9 @@
 
             ws.send(JSON.stringify(payload));
 
-
-
         })
 
+        
         
 
 
@@ -79,16 +92,52 @@
 
             //create
             if (response.method === "create") {
-                gameId = response.game.id;
+                
                 console.log("Game successfully created with Id " + response.game.id + ".");
+
+                document.getElementById("pgameid").innerHTML = response.game.id;
+                
+
             }
 
             //join
 
             if (response.method === "join") {
-                const allclients = response.users;
+                const game = response.game;
 
-                document.getElementById("players").innerHTML = allclients.value;
+                while(divPlayers.firstChild)
+                divPlayers.removeChild(divPlayers.firstChild)
+
+                game.clients.forEach (c => {
+                    
+
+                    //building a Child inside of Playerlist
+                    const d = document.createElement("div");
+                    d.style.width = "200px";
+                    d.style.background = "yellow";
+                    d.textContent = c.username;
+                    divPlayers.appendChild(d);
+                })
+
+
+            }
+
+            if (response.method === "leave") {
+                const game = response.game;
+
+                while(divPlayers.firstChild)
+                divPlayers.removeChild(divPlayers.firstChild)
+
+                game.clients.forEach (c => {
+                    
+
+                    //building a Child inside of Playerlist
+                    const d = document.createElement("div");
+                    d.style.width = "200px";
+                    d.style.background = "yellow";
+                    d.textContent = c.username;
+                    divPlayers.appendChild(d);
+                })
             }
 
         }
