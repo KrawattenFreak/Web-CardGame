@@ -12,6 +12,7 @@
     .karten-section img, .cardPlace, .cardPlaceholder {
         width: 140px;
         height: 210px;
+        
     }
 
 
@@ -20,16 +21,25 @@
     }
 
     .cardPlace {
-        border-color: grey;
-        border-width: 3px;
         position: fixed;
+    }
 
+    .cardPlace img {
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none; 
     }
     
     .karten-section {
         display: flex;
-        flex-wrap: wrap;
-        
+        flex-wrap: wrap;  
     }
 
     .cardPlaceholder {
@@ -43,7 +53,7 @@
 
         <div class="cardPlaceholder" id="triggerCard0">
             <div id="cardPlace0" class="cardPlace"> 
-                <img id= "pic0" src="">
+                <img id= "pic0" src="" draggable="false">
             </div>
         </div>
 
@@ -98,27 +108,17 @@
 
     cards = ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"];
 
-    
     aktualisierung();
-
-
-    //const isgrabbed = false;
-
 
     let ausgewaelteCard = null;
     let targetField = null;
     let cardclickstate = 0;
-
-
-
-
+    let ausgewaelteCardSelected = false;
 
     //States: 
     // 0 = Auswählen zum Herumbewegen
     // 1 = Auswählen der Karte um sie zu plazieren
-    //
-    //
-    //
+
 
     const card = [
         document.getElementById("cardPlace0"),
@@ -139,18 +139,6 @@
         document.getElementById("triggerCard5"),
         document.getElementById("triggerCard6")
     ]
-
-//    for (i in card) {
-//        card[i].addEventListener("click", function () {
-//            ausgewaelteCard = i;
-//            CardAngeklickt();
-//        })
-//
-//    }
-
-
-    
-
 
 
     card[0].addEventListener("click", function () {
@@ -205,17 +193,14 @@
 
 
 
-
-
 //Triggercards
 
     triggercard[0].addEventListener("click", function () {
         if (cardclickstate == 1) {
             targetField = 0;
             CardTriedToPlace();
-            console.log("HALLOO");
         }
-            
+
     })
 
     triggercard[1].addEventListener("click", function () {
@@ -261,9 +246,6 @@
     })
 
 
-    
-
-
 // FUNKTIONEN
 
     function aktualisierung() {
@@ -283,19 +265,24 @@
 
     function CardAngeklickt() {
         if(cards[ausgewaelteCard] != null) {
+            ausgewaelteCardSelected = true;
 
             document.getElementById('cardPlace' + ausgewaelteCard).style.cursor = "grabbing";
             document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "none";
+            document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "100";
+
 
             document.addEventListener('mousemove', function(ev){
+
                 //ÜBERGANGSLÖSUNG
-                document.getElementById('cardPlace' + ausgewaelteCard).style.top = ev.clientY - 105 +  "px";
-                document.getElementById('cardPlace' + ausgewaelteCard).style.left = ev.clientX - 70 + "px";
+                if(ausgewaelteCardSelected == true) {
+                    document.getElementById('cardPlace' + ausgewaelteCard).style.top = ev.clientY - 105 +  "px";
+                    document.getElementById('cardPlace' + ausgewaelteCard).style.left = ev.clientX - 70 + "px";
+                    //ÜBERGANGSLÖSUNG
+                    cardclickstate = 1;
+                }
+
             });
-
-            cardclickstate = 1;
-
-
         } else {
             console.log("Da ist keine Karte.");
         }
@@ -303,23 +290,32 @@
 
 
     function CardTriedToPlace() {
+        
+        document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
 
-        console.log(cards[targetField]);
-        console.log(cards[ausgewaelteCard]);
-        cards[targetField] = cards[ausgewaelteCard];
-
-        //document.getElementById('cardPlace' + ausgewaelteCard).style.top = "0 px";
-        //document.getElementById('cardPlace' + ausgewaelteCard).style.left = "0 px";
-
-
-        //console.log(cards)
-        aktualisierung();
+        if(cards[targetField] != cards[ausgewaelteCard]) {
+            cards[targetField] = cards[ausgewaelteCard];
+            cards[ausgewaelteCard] = null;
+        } else {
+            
+        }
 
         
+        ausgewaelteCardSelected = false;
+        document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "1";
+        document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('left');
+        document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
+        
+        aktualisierung();
+
+        console.log(cards);
+
         cardclickstate = 0;
 
 
     }
+
+
 
     
 
