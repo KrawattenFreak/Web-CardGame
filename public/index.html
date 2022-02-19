@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    h1, p {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .karten-section img, .cardPlace, .cardPlaceholder {
+        width: 140px;
+        height: 210px;
+        
+    }
+
+
+    .cardPlace:hover {
+        cursor: grab;
+    }
+
+    .cardPlace {
+        position: fixed;
+    }
+
+    .cardPlace img {
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none; 
+    }
+    
+    .karten-section {
+        display: flex;
+        flex-wrap: wrap;  
+    }
+
+    .cardPlaceholder {
+        border-style: solid
+    }
+
+</style>
+
+
+<body>
+    <h1>Game</h1>
+
+    <p id = 'pgameid'></p>
+
+    <button id = 'btnCreate'>New Game</button> <br><br>
+    
+    <input id = 'iptUsername' type="text" placeholder="Username">
+    <input id = 'iptGameId' type="text" placeholder="Game-ID">
+    
+
+    <button id = 'btnJoin'>Join</button>
+    <button id = 'btnstartGame'> Start Game </button>
+
+    <p>Mitspieler:</p>
+
+    <div id = "players"></div>
+
+
+
+    <div class="karten-section">
+
+        <div class="cardPlaceholder" id="triggerCard0">
+            <div id="cardPlace0" class="cardPlace"> 
+                <img id= "pic0" src="" draggable="false">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder" id="triggerCard1">
+            <div id="cardPlace1" class="cardPlace"> 
+                <img id= "pic1" src="">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder" id="triggerCard2">
+            <div id="cardPlace2" class="cardPlace"> 
+                <img id= "pic2" src="">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder" id="triggerCard3">
+            <div id="cardPlace3" class="cardPlace"> 
+                <img id= "pic3" src="">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder" id="triggerCard4">
+            <div id="cardPlace4" class="cardPlace"> 
+                <img id= "pic4" src="">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder" id="triggerCard5">
+            <div id="cardPlace5" class="cardPlace"> 
+                <img id= "pic5" src="">
+            </div>
+        </div>
+
+        <div class="cardPlaceholder" id="triggerCard6">
+            <div id="cardPlace6" class="cardPlace"> 
+                <img id= "pic6" src="">
+            </div>
+        </div>
+        
+    </div>
+
+
+
+
+    <script>
+        //HTML elements
+        let cards = [];
+        let clientId = null;
+        let gameId = null;
+        let ws = new WebSocket("ws://localhost:9090")
+        const btnCreate = document.getElementById("btnCreate");
+        const btnJoin = document.getElementById("btnJoin");
+        const txtUsername = document.getElementById("iptUsername");
+        const txtGameId = document.getElementById("iptGameId");
+        const divPlayers = document.getElementById("players");
+        const startGame = document.getElementById('startGame');
+
+        //wiring events
+        btnCreate.addEventListener("click", e => {
+
+            const payLoad = {
+                "method": "create",
+                "clientId": clientId
+            }
+
+            ws.send(JSON.stringify(payLoad));
+        })
+
+        btnJoin.addEventListener("click", e => {
+
+            const username = txtUsername.value;
+            
+            gameId = txtGameId.value;
+
+            const payload = {
+                "method": "join",
+                "clientId": clientId,
+                "gameId": gameId,
+                "username": username
+
+            }
+
+            ws.send(JSON.stringify(payload));
+
+        })
+
+        btnstartGame.addEventListener("click", e => {
+
+            const payload = {
+                "method": "startGame",
+                "gameId": gameId,
+            }
+
+            ws.send(JSON.stringify(payload));
+
+        })
+
+        
+        
+
+
+
+        
+        ws.onmessage = message => {
+            //message.data 
+            const response = JSON.parse(message.data);
+            //connect
+            if(response.method === "connect") {
+                clientId = response.clientId;
+                console.log("Client Id set successfully " + clientId);
+            }
+
+            //create
+            if (response.method === "create") {
+                
+                console.log("Game successfully created with Id " + response.game.id + ".");
+                gameId = response.game.id;
+
+                document.getElementById("pgameid").innerHTML = response.game.id;
+                
+
+            }
+
+            //join
+
+            if (response.method === "join") {
+                const game = response.game;
+
+                while(divPlayers.firstChild)
+                divPlayers.removeChild(divPlayers.firstChild)
+
+                game.clients.forEach (c => {
+                    
+
+                    //building a Child inside of Playerlist
+                    const d = document.createElement("div");
+                    d.style.width = "200px";
+                    d.style.background = "yellow";
+                    d.textContent = c.username;
+                    divPlayers.appendChild(d);
+                })
+
+
+            }
+
+            if (response.method === "leave") {
+                const game = response.game;
+
+                while(divPlayers.firstChild)
+                divPlayers.removeChild(divPlayers.firstChild)
+
+                game.clients.forEach (c => {
+                    
+
+                    //building a Child inside of Playerlist
+                    const d = document.createElement("div");
+                    d.style.width = "200px";
+                    d.style.background = "yellow";
+                    d.textContent = c.username;
+                    divPlayers.appendChild(d);
+                })
+            }
+
+            if (response.method === "startGame") {
+
+                cards = response.cards;
+                console.log(cards);
+                GAME();
+            }
+        }
+
+
+
+
+
+
+
+//------------------------------------
+
+
+    function GAME() {
+        //cards = ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"];
+
+        aktualisierung();
+
+        let ausgewaelteCard = null;
+        let targetField = null;
+        let cardclickstate = 0;
+        let ausgewaelteCardSelected = false;
+
+        //States: 
+        // 0 = Auswählen zum Herumbewegen
+        // 1 = Auswählen der Karte um sie zu plazieren
+
+
+        const card = [
+            document.getElementById("cardPlace0"),
+            document.getElementById("cardPlace1"),
+            document.getElementById("cardPlace2"),
+            document.getElementById("cardPlace3"),
+            document.getElementById("cardPlace4"),
+            document.getElementById("cardPlace5"),
+            document.getElementById("cardPlace6")
+        ]
+
+        const triggercard = [
+            document.getElementById("triggerCard0"),
+            document.getElementById("triggerCard1"),
+            document.getElementById("triggerCard2"),
+            document.getElementById("triggerCard3"),
+            document.getElementById("triggerCard4"),
+            document.getElementById("triggerCard5"),
+            document.getElementById("triggerCard6")
+        ]
+
+
+        card[0].addEventListener("click", function () {
+            if (cardclickstate == 0) {
+                ausgewaelteCard = 0;
+                CardAngeklickt();
+            }
+
+        })
+
+        card[1].addEventListener("click", function () {
+            if (cardclickstate == 0) {
+                ausgewaelteCard = 1;
+                CardAngeklickt();
+            }
+        })
+
+        card[2].addEventListener("click", function () {
+            if (cardclickstate == 0) {
+                ausgewaelteCard = 2;
+                CardAngeklickt();
+            }
+        })
+
+        card[3].addEventListener("click", function () {
+            if (cardclickstate == 0) {
+                ausgewaelteCard = 3;
+                CardAngeklickt();
+            }
+        })
+
+        card[4].addEventListener("click", function () {
+            if (cardclickstate == 0) {    
+                ausgewaelteCard = 4;
+                CardAngeklickt();
+            }
+        })
+
+        card[5].addEventListener("click", function () {
+            if (cardclickstate == 0) {
+                ausgewaelteCard = 5;
+                CardAngeklickt();
+            }
+        })
+
+        card[6].addEventListener("click", function () {
+            if (cardclickstate == 0) {
+                ausgewaelteCard = 6;
+                CardAngeklickt();
+            }
+        })
+
+
+
+    //Triggercards
+
+        triggercard[0].addEventListener("click", function () {
+            if (cardclickstate == 1) {
+                targetField = 0;
+                CardTriedToPlace();
+            }
+
+        })
+
+        triggercard[1].addEventListener("click", function () {
+            if (cardclickstate == 1) {
+                targetField = 1;
+                CardTriedToPlace();
+            }
+        })
+
+        triggercard[2].addEventListener("click", function () {
+            if (cardclickstate == 1) {
+                targetField = 2;
+                CardTriedToPlace();
+            }
+        })
+
+        triggercard[3].addEventListener("click", function () {
+            if (cardclickstate == 1) {
+                targetField = 3;
+                CardTriedToPlace();
+            }
+        })
+
+        triggercard[4].addEventListener("click", function () {
+            if (cardclickstate == 1) {    
+                targetField = 4;
+                CardTriedToPlace();
+            }
+        })
+
+        triggercard[5].addEventListener("click", function () {
+            if (cardclickstate == 1) {
+                targetField = 5;
+                CardTriedToPlace();
+            }
+        })
+
+        triggercard[6].addEventListener("click", function () {
+            if (cardclickstate == 1) {
+                targetField = 6;
+                CardTriedToPlace();
+            }
+        })
+
+
+    // FUNKTIONEN
+
+        function aktualisierung() {
+            for (let i = 0; i<7 ; i++) {
+                if(cards[i] != null) {
+                    document.getElementById("pic"+i).style.visibility = "visible";
+                    document.getElementById("pic"+i).src="./images/" + cards[i] + ".png";
+                } else {
+                    //console.log("An Stelle " + i + " befindet sich keine Karte und wird deaktiviert.");
+                    document.getElementById("pic"+i).style.visibility = "hidden";
+                }
+
+            }
+        }
+
+
+
+        function CardAngeklickt() {
+            if(cards[ausgewaelteCard] != null) {
+                ausgewaelteCardSelected = true;
+
+                document.getElementById('cardPlace' + ausgewaelteCard).style.cursor = "grabbing";
+                document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "none";
+                document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "100";
+
+
+                document.addEventListener('mousemove', function(ev){
+
+                    //ÜBERGANGSLÖSUNG
+                    if(ausgewaelteCardSelected == true) {
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.top = ev.clientY - 105 +  "px";
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.left = ev.clientX - 70 + "px";
+                        //ÜBERGANGSLÖSUNG
+                        cardclickstate = 1;
+                    }
+
+                });
+            } else {
+                console.log("Da ist keine Karte.");
+            }
+        }
+
+
+        function CardTriedToPlace() {
+
+            document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
+
+            if(cards[targetField] != cards[ausgewaelteCard]) {
+                cards[targetField] = cards[ausgewaelteCard];
+                cards[ausgewaelteCard] = null;
+            } else {
+
+            }
+
+
+            ausgewaelteCardSelected = false;
+            document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "1";
+            document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('left');
+            document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
+
+            aktualisierung();
+
+            console.log(cards);
+
+            cardclickstate = 0;
+
+
+        }
+
+    }
+
+    </script>
+
+</body>
+</html>

@@ -1,7 +1,16 @@
+const res = require("express/lib/response");
 const http = require("http");
 const { connection } = require("websocket");
-const app = require("express")();
-app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"))
+const express = require("express");
+const app = express();
+
+app.use(express.static('public'));
+
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/public/index.html")
+    console.log(res);
+
+})
 
 app.listen(9091, () => console.log("Listening on http port 9091"))
 const websocketServer = require("websocket").server
@@ -14,6 +23,11 @@ const games = {};
 const wsServer = new websocketServer({
     "httpServer": httpServer
 })
+
+
+
+
+
 
 
 wsServer.on("request", request => {
@@ -114,6 +128,16 @@ wsServer.on("request", request => {
             
         }
 
+
+        if (result.method === "startGame") {
+            const gameId = result.gameId;
+            //Verweis auf StartGame Funktion! Yeah.
+            GAME(gameId);
+        }
+
+
+
+
     })
 
     //generate a new clientID
@@ -149,3 +173,39 @@ function getClientIdByConnection(connectionfunction) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+//_________________________________________________________________________________________
+//GAME
+
+
+function GAME(e) {
+    const currentGame = games[e];
+    
+    const payLoad = {
+        "method": "startGame",
+        "cards": ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"]
+    }
+
+
+    currentGame.clients.forEach(c=> {
+        clients[c.clientId].connection.send(JSON.stringify(payLoad));
+    })
+
+
+
+
+
+
+    console.log(currentGame)
+}
