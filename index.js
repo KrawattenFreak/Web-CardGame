@@ -26,7 +26,38 @@ const wsServer = new websocketServer({
 
 
 
+const damagecard = {
+    "DemoKarte_0": 50,
+    "DemoKarte_1": 60,
+    "DemoKarte_2": 50,
+    "DemoKarte_3": 30,
+    "DemoKarte_4": 30,
+    "DemoKarte_5": 40,
+    "DemoKarte_6": 50,
+    "DemoKarte_7": 10,
+    "DemoKarte_8": 10,
+    "DemoKarte_9": 40,
+    "DemoKarte_10": 30,
+    "DemoKarte_11": 110,
+    "DemoKarte_12": 160,
+    "DemoKarte_13": 225,
+    "DemoKarte_14": 230,
+    "DemoKarte_15": 650,
+    "DemoKarte_16": 100,
+    "DemoKarte_17": 150,
+    "DemoKarte_18": 130,
+    "DemoKarte_19": 240,
+    "DemoKarte_20": 110,
+    "DemoKarte_21": 370,
+    "DemoKarte_22": 20,
+    "DemoKarte_23": 40,
+    "DemoKarte_24": 30,
+    "DemoKarte_25": 350,
+    "DemoKarte_26": 800,
+    "DemoKarte_27": 550,
+    "DemoKarte_28": 2000,
 
+}
 
 
 
@@ -114,6 +145,8 @@ wsServer.on("request", request => {
                 "clientId": clientId,
                 "username": username,
                 "health": null,
+                "divCard" : null,
+                "isDeath" : false
             })
 
 
@@ -137,6 +170,61 @@ wsServer.on("request", request => {
             const gameId = result.gameId;
             //Verweis auf StartGame Funktion! Yeah.
             GAME(gameId);
+        }
+
+        if (result.method === "attack") {
+            const gameId = result.game;
+            const target = result.target;
+            console.log(target);
+            
+            games[gameId].clients.forEach (c => {
+                
+                if(c.clientId == target) {
+                    c.health -= damagecard[result.card];
+
+                    console.log(c.health);
+                    
+                    let payLoad = {
+                        "method": "attack",
+                        "damage": damagecard[result.card],
+                        "target": target,
+                        "isDeath": null
+                    }
+
+                    if(c.health > 0) {
+                        c.isDeath = true;
+
+                        payLoad.isDeath = false
+
+                    } else {
+
+                        payLoad.isDeath = true
+                    }
+
+                    
+
+                    
+
+                    games[gameId].clients.forEach(c=> {
+                        clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                    })
+
+                    
+
+                    
+
+
+
+                }
+
+            })
+
+            //console.log(damagecard[result.card] + " an User " + result.target);
+
+
+            
+            
+
         }
 
 
@@ -180,35 +268,33 @@ function getClientIdByConnection(connectionfunction) {
 
 
 
-
-
-
-
-
-
-
-
-
 //_________________________________________________________________________________________
 //GAME
 
 
+
+
+
 function GAME(e) {
+
+    
+
+    const startHealth = 1000;
     const currentGame = games[e];
 
-    //for (let i = 0; i< )
 
 
     
     const payLoad = {
         "method": "startGame",
         "cards": ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"],
-        "startHealth" : 1000
+        "startHealth" : startHealth
     }
 
 
+
     currentGame.clients.forEach(c=> {
-        c.health = 200;
+        c.health = startHealth;
         clients[c.clientId].connection.send(JSON.stringify(payLoad));
     })
 
@@ -216,3 +302,11 @@ function GAME(e) {
 
 
 }
+
+
+
+
+// Soooo Tim. Ich hab da aufgehört, dass nun Clientseitig angezeigt wird wenn jemand Tot ist.
+// Auf dem Server wird auch schon im Game aufgeschrieben dass man Tot ist.
+// Es wird aber noch nicht überprüft wenn man einen Angriff startet, ob der Gegner bereits tot ist.
+// ----> nächste Aufgabe!

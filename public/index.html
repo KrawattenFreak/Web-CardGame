@@ -57,6 +57,9 @@
 
 
 <body>
+
+    
+
     <h1>Game</h1>
 
     <p id = 'pgameid'></p>
@@ -128,8 +131,10 @@
     <script>
         //HTML elements
         let cards = [];
+        let inGame = false;
         let clientId = null;
         let gameId = null;
+        let maxVisibleProg = 2000;
         let ws = new WebSocket("ws://localhost:9090")
         const btnCreate = document.getElementById("btnCreate");
         const btnJoin = document.getElementById("btnJoin");
@@ -137,6 +142,8 @@
         const txtGameId = document.getElementById("iptGameId");
         const divPlayers = document.getElementById("players");
         const startGame = document.getElementById('startGame');
+
+        let game = null;
 
         //wiring events
         btnCreate.addEventListener("click", e => {
@@ -207,6 +214,31 @@
             //join
 
             if (response.method === "join") {
+                game = response.game;
+
+                while(divPlayers.firstChild)
+                divPlayers.removeChild(divPlayers.firstChild)
+
+                game.clients.forEach (c => {
+                    
+
+                    //building a Child inside of Playerlist
+                    const d = document.createElement("div");
+                    d.style.width = "200px";
+                    d.style.background = "yellow";
+                    d.textContent = c.username;
+                    d.setAttribute("id", c.clientId);
+                    c.divCard = d;
+                    divPlayers.appendChild(d);
+                    const p = document.createElement("progress");
+                    divPlayers.appendChild(p);
+                    p.setAttribute("id", c.clientId+"progress");
+                })
+
+
+            }
+
+            if (response.method === "leave") {
                 const game = response.game;
 
                 while(divPlayers.firstChild)
@@ -220,28 +252,12 @@
                     d.style.width = "200px";
                     d.style.background = "yellow";
                     d.textContent = c.username;
-                    d.setAttribute("id", c.clientId)
+                    d.setAttribute("id", c.clientId);
+                    c.divCard = d;
                     divPlayers.appendChild(d);
-                })
-
-
-            }
-
-            if (response.method === "leave") {
-                const game = response.game;
-
-                while(divPlayers.firstChild)
-                divPlayers.removeChild(divPlayers.firstChild)
-
-                game.clients.forEach (c => {
-
-
-                    //building a Child inside of Playerlist
-                    const d = document.createElement("div");
-                    d.style.width = "200px";
-                    d.style.background = "yellow";
-                    d.textContent = c.username;
-                    divPlayers.appendChild(d);
+                    const p = document.createElement("progress");
+                    divPlayers.appendChild(p);
+                    p.setAttribute("id", c.clientId+"progress");
                 })
 
                 console.log(game.clients);
@@ -251,9 +267,31 @@
             if (response.method === "startGame") {
 
                 cards = response.cards;
-                console.log(cards);
-                GAME();
+                const startHealth = response.startHealth;
+                GAME(startHealth);
             }
+
+            if (response.method === "attack") {
+                if(inGame == true) {
+
+                    game.clients.forEach (c => {
+                        if (c.clientId == response.target) {
+                            c.health -= response.damage;
+                            document.getElementById(c.clientId+"progress").setAttribute("value", c.health);
+
+                            if(response.isDeath == true ) {
+                                document.getElementById(c.clientId+"progress").setAttribute("value", 0);
+                                document.getElementById(c.clientId+"progress").style.backgroundColor = "red";
+                            }
+
+                        }
+                    })
+                }
+                
+            }
+
+
+
         }
 
 
@@ -265,7 +303,9 @@
 //------------------------------------
 
 
-    function GAME() {
+    function GAME(startHealth) {
+
+        inGame = true;
         //cards = ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"];
 
         aktualisierung();
@@ -403,6 +443,47 @@
                 targetField = 6;
                 CardTriedToPlace();
             }
+        })
+
+        game.clients.forEach (c => {
+            c.divCard.style.background = "blue";
+            c.divCard.style.color = "white";
+            
+
+            c.health = startHealth;
+            document.getElementById(c.clientId+"progress").setAttribute("max", maxVisibleProg);
+            document.getElementById(c.clientId+"progress").setAttribute("value", c.health);
+            
+                    
+
+
+
+
+
+
+
+            
+            c.divCard.addEventListener("click", e => { 
+                if(cardclickstate == 1) {
+                    console.log("Angriff auf " + c.username + ".");
+
+                    console.log(cards[ausgewaelteCard]);
+
+
+                    const payload = {
+                        "method": "attack",
+                        "card": cards[ausgewaelteCard],
+                        "target": c.clientId,
+                        "game": gameId
+                    }
+
+
+                    ws.send(JSON.stringify(payload));
+
+                }
+                
+
+            })
         })
 
 
