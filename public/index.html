@@ -24,7 +24,7 @@
     }
 
     .cardPlace {
-        position: fixed;
+        position: absolute;
     }
 
     .cardPlace img {
@@ -47,6 +47,10 @@
 
     .cardPlaceholder {
         border-style: solid
+    }
+
+    #players {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     }
 
 </style>
@@ -216,6 +220,7 @@
                     d.style.width = "200px";
                     d.style.background = "yellow";
                     d.textContent = c.username;
+                    d.setAttribute("id", c.clientId)
                     divPlayers.appendChild(d);
                 })
 
@@ -229,7 +234,7 @@
                 divPlayers.removeChild(divPlayers.firstChild)
 
                 game.clients.forEach (c => {
-                    
+
 
                     //building a Child inside of Playerlist
                     const d = document.createElement("div");
@@ -238,6 +243,9 @@
                     d.textContent = c.username;
                     divPlayers.appendChild(d);
                 })
+
+                console.log(game.clients);
+
             }
 
             if (response.method === "startGame") {

@@ -43,6 +43,7 @@ wsServer.on("request", request => {
     const clientId = getClientIdByConnection(connection);
 
     
+    
     //HIER WILL ICH VERSUCHEN DIE CLIENT ID VON DEN CLIENTS GAME ZU LÖSCHEN!
     for (i in games) {
         
@@ -51,11 +52,12 @@ wsServer.on("request", request => {
                 console.log("Der Spieler " + d.username  + " aus dem Spiel " + games[i].id + " hat das Spiel verlassen.")
 
                 
-                const index = games[i].clients.indexOf(clientId);
-                games[i].clients.splice(index, 1); 
-                
-                const game = games[i];
+                const index = games[i].clients.indexOf(d);
 
+                games[i].clients.splice(index, 1); 
+
+                const game = games[i];
+                
                 const payLoad = {
                     "method": "leave",
                     "game": game
@@ -65,6 +67,7 @@ wsServer.on("request", request => {
                 //loop through all clients and tell them that people had joined
                 game.clients.forEach(c=> {
                     clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                    //console.log(c.clientId + " gesendet!");
                 })
             } 
         });
@@ -109,7 +112,8 @@ wsServer.on("request", request => {
 
             game.clients.push({
                 "clientId": clientId,
-                "username": username
+                "username": username,
+                "health": null,
             })
 
 
@@ -191,21 +195,24 @@ function getClientIdByConnection(connectionfunction) {
 
 function GAME(e) {
     const currentGame = games[e];
+
+    //for (let i = 0; i< )
+
+
     
     const payLoad = {
         "method": "startGame",
-        "cards": ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"]
+        "cards": ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"],
+        "startHealth" : 1000
     }
 
 
     currentGame.clients.forEach(c=> {
+        c.health = 200;
         clients[c.clientId].connection.send(JSON.stringify(payLoad));
     })
 
+    console.log(currentGame);
 
 
-
-
-
-    console.log(currentGame)
 }
