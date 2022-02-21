@@ -306,7 +306,128 @@
     function GAME(startHealth) {
 
         inGame = true;
-        //cards = ["DemoKarte_12", null, null , "DemoKarte_13", null, null, "DemoKarte_26"];
+
+
+        const cardDictionary = {
+            "DemoKarte_0": {
+                "DemoKarte_1": "DemoKarte_12",
+                "DemoKarte_9": "DemoKarte_11"
+            },
+            "DemoKarte_1": {
+                "DemoKarte_0": "DemoKarte_12",
+                "DemoKarte_11": "DemoKarte_13"
+            },
+            "DemoKarte_2": {
+                "DemoKarte_3": "DemoKarte_16"
+            },
+            "DemoKarte_3": {
+                "DemoKarte_2": "DmoKarte_16",
+                "DemoKarte_21": "DemoKarte_27"
+            },
+            "DemoKarte_4": {
+                "DemoKarte_16": "DemoKarte_17",
+                "DemoKarte_17": "DemoKarte_25",
+                "DemoKarte_5": "DemoKarte_18"
+            },
+            "DemoKarte_5": {
+                "DemoKarte_4": "DemoKarte_18",
+                "DemoKarte_6": "DemoKarte_20"
+            },
+            "DemoKarte_6": {
+                "DemoKarte_18": "DemoKarte_19",
+                "DemoKarte_5": "DemoKarte_20",
+                "DemoKarte_22": "DemoKarte_23"
+            },
+            "DemoKarte_7": {
+                "DemoKarte_8": "DemoKarte_22"
+            },
+            "DemoKarte_8": {
+                "DemoKarte_7": "DemoKarte_22"
+            },
+            "DemoKarte_9": {
+                "DemoKarte_0": "DemoKarte_11"
+            },
+            "DemoKarte_10": {
+                "DemoKarte_12": "DemoKarte_14"
+            },
+            "DemoKarte_11": {
+                "DemoKarte_1": "DemoKarte_13"
+            },
+            "DemoKarte_12": {
+                "DemoKarte_10": "DemoKarte_14"
+            },
+            "DemoKarte_13": {
+                "DemoKarte_14": "DemoKarte_15"
+            },
+            "DemoKarte_14": {
+                "DemoKarte_13": "DemoKarte_15"
+            },
+            "DemoKarte_15": {
+                "DemoKarte_26": "DemoKarte_28"
+            },
+            "DemoKarte_16": {
+                "DemoKarte_4": "DemoKarte_17"
+            },
+            "DemoKarte_17": {
+                "DemoKarte_4": "DemoKarte_25"
+            },
+            "DemoKarte_18": {
+                "DemoKarte_6": "DemoKarte_19",
+                "DemoKarte_23": "DemoKarte_24"
+            },
+            "DemoKarte_19": {
+                "DemoKarte_25": "DemoKarte_26",
+                "DemoKarte_20": "DemoKarte_21"
+            },
+            "DemoKarte_20": {
+                "DemoKarte_19": "DemoKarte_21"
+            },
+            "DemoKarte_21": {
+                "DemoKarte_3": "DemoKarte_28"
+            },
+            "DemoKarte_22": {
+                "DemoKarte_6": "DemoKarte_23"
+            },
+            "DemoKarte_23": {
+                "DemoKarte_18": "DemoKarte_24"
+            },
+            "DemoKarte_24": {
+                "DemoKarte_27": "DemoKarte_28"
+            },
+            "DemoKarte_25": {
+                "DemoKarte_19": "DemoKarte_26"
+            },
+            "DemoKarte_26": {
+                "DemoKarte_15": "DemoKarte_28"
+            },
+            "DemoKarte_27": {
+                "DemoKarte_24": "DemoKarte_28"
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         aktualisierung();
 
@@ -469,16 +590,43 @@
 
                     console.log(cards[ausgewaelteCard]);
 
+                    if(c.health > 0) {
 
-                    const payload = {
-                        "method": "attack",
-                        "card": cards[ausgewaelteCard],
-                        "target": c.clientId,
-                        "game": gameId
+                     
+                        const payload = {
+                            "method": "attack",
+                            "card": cards[ausgewaelteCard],
+                            "target": c.clientId,
+                            "game": gameId
+                        }
+
+
+                        ws.send(JSON.stringify(payload));
+
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
+                        ausgewaelteCardSelected = false;
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "1";
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('left');
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
+
+                        cards[ausgewaelteCard] = null;
+
+                        aktualisierung();
+
+                        console.log(cards);
+
+                        cardclickstate = 0;
+
+
+
+
+
+
+
+
+                    } else {
+                        console.log("Der Spieler ist bereits tot.")
                     }
-
-
-                    ws.send(JSON.stringify(payload));
 
                 }
                 
@@ -532,11 +680,35 @@
 
         function CardTriedToPlace() {
 
+            let commonFound = false;
+
             document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
 
-            if(cards[targetField] != cards[ausgewaelteCard]) {
-                cards[targetField] = cards[ausgewaelteCard];
-                cards[ausgewaelteCard] = null;
+            console.log(targetField);
+            console.log(ausgewaelteCard);
+
+            if(targetField != ausgewaelteCard) {
+
+
+                cardDictionary[cards[ausgewaelteCard]].forEach (c => {
+                    if(c == cards[targetField]) {
+                        cards[targetField] = cardDictionary[cards[ausgewaelteCard]][cards[targetField]];
+                        commonFound = true;
+                    } else {
+                        
+                    }
+
+
+                })
+
+                if (commonFound == false) {
+                    cards[targetField] = cards[ausgewaelteCard];
+                    cards[ausgewaelteCard] = null;
+                } else {
+                    commonFound = false;
+                }
+
+                
             } else {
 
             }
