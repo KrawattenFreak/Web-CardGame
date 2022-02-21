@@ -175,7 +175,6 @@ wsServer.on("request", request => {
         if (result.method === "attack") {
             const gameId = result.game;
             const target = result.target;
-            console.log(target);
             
             games[gameId].clients.forEach (c => {
                 
@@ -183,8 +182,6 @@ wsServer.on("request", request => {
                     if(c.isDeath != true) {
 
                         c.health -= damagecard[result.card];
-
-                        console.log(c.health);
 
                         let payLoad = {
                             "method": "attack",
@@ -284,7 +281,7 @@ function GAME(e) {
     
     const payLoad = {
         "method": "startGame",
-        "cards": [null, null, null , null, null, null, null],
+        "cards": ["DemoKarte_2", "DemoKarte_3", "DemoKarte_4" , null, null, null, null],
         "startHealth" : startHealth
     }
 
@@ -296,21 +293,44 @@ function GAME(e) {
 
 
         
-        let keys = Object.keys(damagecard)
-        let prop = keys[Math.floor(Math.random() * 11)]
-
-        payLoad.cards[0] = prop;
-
-        keys = Object.keys(damagecard)
-        prop = keys[Math.floor(Math.random() * 11)]
-
-        payLoad.cards[1] = prop;
+        //let keys = Object.keys(damagecard)
+        //let prop = keys[Math.floor(Math.random() * 11)]
+//
+        //payLoad.cards[0] = prop;
+//
+        //keys = Object.keys(damagecard)
+        //prop = keys[Math.floor(Math.random() * 11)]
+//
+        //payLoad.cards[1] = prop;
 
 
         clients[c.clientId].connection.send(JSON.stringify(payLoad));
     })
 
     console.log(currentGame);
+
+    let gameEnded = false;
+
+    //while (gameEnded == true) {
+
+        let currentclients = currentGame.clients;
+
+        //console.log(currentclients.length);
+
+        let playeramZug = 0;
+
+        const payLoadZug = {
+            "method": "amZug"
+        }
+
+        clients[currentclients[playeramZug].clientId].connection.send(JSON.stringify(payLoadZug));
+        
+
+
+    //}
+
+
+
 
 
 }

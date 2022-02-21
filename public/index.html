@@ -321,7 +321,7 @@
                 "DemoKarte_3": "DemoKarte_16"
             },
             "DemoKarte_3": {
-                "DemoKarte_2": "DmoKarte_16",
+                "DemoKarte_2": "DemoKarte_16",
                 "DemoKarte_21": "DemoKarte_27"
             },
             "DemoKarte_4": {
@@ -586,9 +586,7 @@
             
             c.divCard.addEventListener("click", e => { 
                 if(cardclickstate == 1) {
-                    console.log("Angriff auf " + c.username + ".");
-
-                    console.log(cards[ausgewaelteCard]);
+                    //console.log("Angriff auf " + c.username + ".");
 
                     if(c.health > 0) {
 
@@ -684,13 +682,11 @@
 
             document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
 
-            console.log(targetField);
-            console.log(ausgewaelteCard);
 
             if(targetField != ausgewaelteCard) {
 
-
-                cardDictionary[cards[ausgewaelteCard]].forEach (c => {
+                
+                for (c in cardDictionary[cards[ausgewaelteCard]]) {
                     if(c == cards[targetField]) {
                         cards[targetField] = cardDictionary[cards[ausgewaelteCard]][cards[targetField]];
                         commonFound = true;
@@ -699,15 +695,16 @@
                     }
 
 
-                })
+                }
 
                 if (commonFound == false) {
                     cards[targetField] = cards[ausgewaelteCard];
-                    cards[ausgewaelteCard] = null;
+                    
                 } else {
                     commonFound = false;
                 }
 
+                cards[ausgewaelteCard] = null;
                 
             } else {
 
@@ -721,7 +718,7 @@
 
             aktualisierung();
 
-            console.log(cards);
+            //console.log(cards);
 
             cardclickstate = 0;
 
