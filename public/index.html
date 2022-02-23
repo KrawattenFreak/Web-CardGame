@@ -8,15 +8,15 @@
 </head>
 
 <style>
-    h1, p {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    
 
     .karten-section img, .cardPlace, .cardPlaceholder {
         width: 140px;
         height: 210px;
         
     }
+
+    
 
 
     .cardPlace:hover {
@@ -53,79 +53,111 @@
         font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     }
 
+
+
+/*--------------------*/
+    body {
+        background-image: url(./images/WaitScreenBackground.png);
+        margin: 0;
+        padding: 0;
+    }
+
+    h1, p {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    h1 {
+        color:white;
+        padding-bottom: 4px;
+    }
+
+    .head {
+        height: 70px;
+        background-color: rgb(27, 27, 27);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
 </style>
 
 
 <body>
 
-    
-
-    <h1>Card Game</h1>
-
-    <p id = 'pgameid'></p>
-
-    <button id = 'btnCreate'>New Game</button> <br><br>
-    
-    <input id = 'iptUsername' type="text" placeholder="Username">
-    <input id = 'iptGameId' type="text" placeholder="Game-ID">
-    
-
-    <button id = 'btnJoin'>Join</button>
-    <button id = 'btnstartGame'> Start Game </button>
-    <button id = "btnFinishRound">Finish</button>
-
-    <p>Mitspieler:</p>
-
-    <div id = "players"></div>
-
-
-
-    <div class="karten-section">
-
-        <div class="cardPlaceholder" id="triggerCard0">
-            <div id="cardPlace0" class="cardPlace"> 
-                <img id= "pic0" src="" draggable="false">
-            </div>
+    <div class="wrapper">
+        <div class="head">
+            <h1>Card Game</h1>
         </div>
 
-        <div class="cardPlaceholder" id="triggerCard1">
-            <div id="cardPlace1" class="cardPlace"> 
-                <img id= "pic1" src="">
-            </div>
-        </div>
-
-        <div class="cardPlaceholder" id="triggerCard2">
-            <div id="cardPlace2" class="cardPlace"> 
-                <img id= "pic2" src="">
-            </div>
-        </div>
-
-        <div class="cardPlaceholder" id="triggerCard3">
-            <div id="cardPlace3" class="cardPlace"> 
-                <img id= "pic3" src="">
-            </div>
-        </div>
-
-        <div class="cardPlaceholder" id="triggerCard4">
-            <div id="cardPlace4" class="cardPlace"> 
-                <img id= "pic4" src="">
-            </div>
-        </div>
-
-        <div class="cardPlaceholder" id="triggerCard5">
-            <div id="cardPlace5" class="cardPlace"> 
-                <img id= "pic5" src="">
-            </div>
-        </div>
-
-        <div class="cardPlaceholder" id="triggerCard6">
-            <div id="cardPlace6" class="cardPlace"> 
-                <img id= "pic6" src="">
-            </div>
-        </div>
         
-    </div>
 
+        <p id = 'pgameid'></p>
+
+        <button id = 'btnCreate'>New Game</button> <br><br>
+        
+        <input id = 'iptUsername' type="text" placeholder="Username">
+        <input id = 'iptGameId' type="text" placeholder="Game-ID">
+        
+
+        <button id = 'btnJoin'>Join</button>
+        <button id = 'btnstartGame'> Start Game </button>
+        <button id = "btnFinishRound">Finish</button>
+
+        <p>Mitspieler:</p>
+
+        <div id = "players"></div>
+
+
+
+        <div class="karten-section">
+
+            <div class="cardPlaceholder" id="triggerCard0">
+                <div id="cardPlace0" class="cardPlace"> 
+                    <img id= "pic0" src="" draggable="false">
+                </div>
+            </div>
+
+            <div class="cardPlaceholder" id="triggerCard1">
+                <div id="cardPlace1" class="cardPlace"> 
+                    <img id= "pic1" src="">
+                </div>
+            </div>
+
+            <div class="cardPlaceholder" id="triggerCard2">
+                <div id="cardPlace2" class="cardPlace"> 
+                    <img id= "pic2" src="">
+                </div>
+            </div>
+
+            <div class="cardPlaceholder" id="triggerCard3">
+                <div id="cardPlace3" class="cardPlace"> 
+                    <img id= "pic3" src="">
+                </div>
+            </div>
+
+            <div class="cardPlaceholder" id="triggerCard4">
+                <div id="cardPlace4" class="cardPlace"> 
+                    <img id= "pic4" src="">
+                </div>
+            </div>
+
+            <div class="cardPlaceholder" id="triggerCard5">
+                <div id="cardPlace5" class="cardPlace"> 
+                    <img id= "pic5" src="">
+                </div>
+            </div>
+
+            <div class="cardPlaceholder" id="triggerCard6">
+                <div id="cardPlace6" class="cardPlace"> 
+                    <img id= "pic6" src="">
+                </div>
+            </div>
+
+        </div>
+    </div>
 
 
 
@@ -136,6 +168,7 @@
         let clientId = null;
         let gameId = null;
         let maxVisibleProg = 2000;
+        let bistAuserwählt = false;
         let ws = new WebSocket("ws://localhost:9090")
         const btnCreate = document.getElementById("btnCreate");
         const btnJoin = document.getElementById("btnJoin");
@@ -187,9 +220,23 @@
 
         })
 
-        
-        
+        btnFinishRound.addEventListener("click", e => {
+                if (bistAuserwählt == true) {
+                    const payLoad = {
+                        "method": "finishedRound",
+                        "gameId": gameId,
+                        "clientId": clientId
+                        
+                    }
+                    ws.send(JSON.stringify(payLoad));
+                    console.log("GESENDET!");
+                } else {
+                    console.log("Du bist nicht dran!");
+                }
 
+                bistAuserwählt = false;
+                    
+            })
 
 
         
@@ -306,30 +353,15 @@
                     document.getElementById(c.clientId).style.background = "blue";
                 }) 
                     
-                    
-                
+
 
                 document.getElementById(response.player).style.backgroundColor = "green";
-                
 
                 
-                
-                btnFinishRound.addEventListener("click", e => {
-                    const payLoad = {
-                        "method": "finishedRound",
-                        "gameId": gameId,
-                        "clientId": clientId
-                    }
+                if (clientId == response.player) {
+                    bistAuserwählt = true;
+                }
 
-                    ws.send(JSON.stringify(payLoad));
-                
-                })
-
-                
-
-                
-
-                
             }
 
 
@@ -759,7 +791,6 @@
             document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
 
             aktualisierung();
-
             //console.log(cards);
 
             cardclickstate = 0;

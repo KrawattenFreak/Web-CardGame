@@ -221,6 +221,7 @@ wsServer.on("request", request => {
         }
 
         if(result.method === "finishedRound") {
+            console.log("Die Game ID ist " + result.gameId)
             console.log(result.clientId);
             console.log(games[result.gameId].clients[games[result.gameId].playeramZug].clientId);
 
