@@ -60,7 +60,7 @@
 
     
 
-    <h1>Game</h1>
+    <h1>Card Game</h1>
 
     <p id = 'pgameid'></p>
 
@@ -72,6 +72,7 @@
 
     <button id = 'btnJoin'>Join</button>
     <button id = 'btnstartGame'> Start Game </button>
+    <button id = "btnFinishRound">Finish</button>
 
     <p>Mitspieler:</p>
 
@@ -138,6 +139,7 @@
         let ws = new WebSocket("ws://localhost:9090")
         const btnCreate = document.getElementById("btnCreate");
         const btnJoin = document.getElementById("btnJoin");
+        const btnFinishRound = document.getElementById("btnFinishRound");
         const txtUsername = document.getElementById("iptUsername");
         const txtGameId = document.getElementById("iptGameId");
         const divPlayers = document.getElementById("players");
@@ -228,6 +230,7 @@
                     d.style.background = "yellow";
                     d.textContent = c.username;
                     d.setAttribute("id", c.clientId);
+                    d.setAttribute("class", "oneplayer");
                     c.divCard = d;
                     divPlayers.appendChild(d);
                     const p = document.createElement("progress");
@@ -253,6 +256,7 @@
                     d.style.background = "yellow";
                     d.textContent = c.username;
                     d.setAttribute("id", c.clientId);
+                    d.setAttribute("class", "oneplayer");
                     c.divCard = d;
                     divPlayers.appendChild(d);
                     const p = document.createElement("progress");
@@ -287,6 +291,44 @@
                         }
                     })
                 }
+                
+            }
+
+            if (response.method === "amZug") {
+                
+                const currentGameClients = response.clients
+                
+                console.log(currentGameClients);
+
+
+                currentGameClients.forEach(c => {
+                    console.log(c.clientId);
+                    document.getElementById(c.clientId).style.background = "blue";
+                }) 
+                    
+                    
+                
+
+                document.getElementById(response.player).style.backgroundColor = "green";
+                
+
+                
+                
+                btnFinishRound.addEventListener("click", e => {
+                    const payLoad = {
+                        "method": "finishedRound",
+                        "gameId": gameId,
+                        "clientId": clientId
+                    }
+
+                    ws.send(JSON.stringify(payLoad));
+                
+                })
+
+                
+
+                
+
                 
             }
 

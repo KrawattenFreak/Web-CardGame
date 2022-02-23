@@ -116,7 +116,10 @@ wsServer.on("request", request => {
             const gameId = guid();
             games[gameId] = {
                 "id": gameId,
-                "clients": []
+                "clients": [],
+                "playerAmount" : null,
+                "playeramZug": null,
+                "gameEnded": null,
             }
 
             const payLoad = {
@@ -215,10 +218,20 @@ wsServer.on("request", request => {
 
             //console.log(damagecard[result.card] + " an User " + result.target);
 
+        }
 
-            
-            
+        if(result.method === "finishedRound") {
+            console.log(result.clientId);
+            console.log(games[result.gameId].clients[games[result.gameId].playeramZug].clientId);
 
+             if(result.clientId == games[result.gameId].clients[games[result.gameId].playeramZug].clientId) {
+                console.log("Runde erfolgreich beendet!");
+                SpielerRunde(games[result.gameId]);
+             } else {
+                 console.log("hacker")
+             }
+                
+            
         }
 
 
@@ -269,68 +282,73 @@ function getClientIdByConnection(connectionfunction) {
 
 
 
-function GAME(e) {
 
-    
+
+function GAME(e) {
 
     const startHealth = 1000;
     const currentGame = games[e];
-
-
-
     
     const payLoad = {
         "method": "startGame",
-        "cards": ["DemoKarte_2", "DemoKarte_3", "DemoKarte_4" , null, null, null, null],
+        "cards": ["DemoKarte_2", "DemoKarte_3", null, null, null, null, null],
         "startHealth" : startHealth
     }
 
-
-
     currentGame.clients.forEach(c=> {
         c.health = startHealth;
-
-
-
         
-        //let keys = Object.keys(damagecard)
-        //let prop = keys[Math.floor(Math.random() * 11)]
-//
-        //payLoad.cards[0] = prop;
-//
-        //keys = Object.keys(damagecard)
-        //prop = keys[Math.floor(Math.random() * 11)]
-//
-        //payLoad.cards[1] = prop;
-
+        payLoad.cards[0] = randomCard();
+        payLoad.cards[1] = randomCard();
 
         clients[c.clientId].connection.send(JSON.stringify(payLoad));
     })
 
+    currentGame.gameEnded = false;
+    
+    currentGame.playeramZug = 0;
+
+    currentGame.playerAmount = currentGame.clients.length - 1;
+
+    SpielerRunde(currentGame);
+
+}
+
+
+
+function randomCard() {
+    keys = Object.keys(damagecard)
+    prop = keys[Math.floor(Math.random() * 11)]
+    return prop;
+}
+
+function SpielerRunde(currentGame) {
+
+    console.log("Runde begonnen!");
+    currentGame.playerAmount = currentGame.clients.length - 1;
+    console.log("Die Spieleranzahl ist " + currentGame.playerAmount);
+    currentGame.playeramZug += 1;
+    console.log("Momentan ist Spieler " + currentGame.playeramZug + " dran.")
+
+    if(currentGame.playeramZug > currentGame.playerAmount) {
+        currentGame.playeramZug = 0;
+        console.log("Da die maximale Spieleranzahl von " + currentGame.playerAmount + " überschritten wurde, wurde nun der Playerzug auf " + currentGame.playeramZug + " gesetzt.")
+    }
+
+
+
+    const payLoadZug = {
+        "method": "amZug",
+        "player": currentGame.clients[currentGame.playeramZug].clientId,
+        "getCard": "DemoKarte_" + randomCard(),
+        "clients": currentGame.clients
+    }
+
+
+    currentGame.clients.forEach(c=> {
+        clients[c.clientId].connection.send(JSON.stringify(payLoadZug));
+    })
+
     console.log(currentGame);
-
-    let gameEnded = false;
-
-    //while (gameEnded == true) {
-
-        let currentclients = currentGame.clients;
-
-        //console.log(currentclients.length);
-
-        let playeramZug = 0;
-
-        const payLoadZug = {
-            "method": "amZug"
-        }
-
-        clients[currentclients[playeramZug].clientId].connection.send(JSON.stringify(payLoadZug));
-        
-
-
-    //}
-
-
-
-
-
+    //clients[currentclients[playeramZug].clientId].connection.send(JSON.stringify(payLoadZug));
 }
