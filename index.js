@@ -7,7 +7,11 @@ const { connection } = require("websocket");
 
 const websocketServer = require("websocket").server
 const httpServer = http.createServer();
+
+
+//process.env.PORT
 httpServer.listen(9090, () => console.log("Listening.. on 9090"))
+
 //hashmap clients
 const clients = {};
 const games = {};
