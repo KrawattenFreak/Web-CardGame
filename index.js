@@ -341,7 +341,7 @@ function SpielerRunde(currentGame) {
     const payLoadZug = {
         "method": "amZug",
         "player": currentGame.clients[currentGame.playeramZug].clientId,
-        "getCard": "DemoKarte_" + randomCard(),
+        "getCard": randomCard(),
         "clients": currentGame.clients
     }
 
@@ -353,3 +353,5 @@ function SpielerRunde(currentGame) {
     console.log(currentGame);
     //clients[currentclients[playeramZug].clientId].connection.send(JSON.stringify(payLoadZug));
 }
+
+

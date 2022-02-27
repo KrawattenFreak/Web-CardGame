@@ -25,6 +25,7 @@
 
     .cardPlace {
         position: absolute;
+        
     }
 
     .cardPlace img {
@@ -38,15 +39,23 @@
         -khtml-user-drag: none; 
         -moz-user-drag: none; 
         -o-user-drag: none; 
+
     }
     
     .karten-section {
         display: flex;
         flex-wrap: wrap;  
+        justify-content: center;
+        margin-top: 200px;
     }
 
     .cardPlaceholder {
-        border-style: solid
+        border-style: solid;
+        border-color: rgb(41, 41, 41);
+        border-radius: 7px;
+        margin: 0 6px;
+        box-shadow: 0px 5px 10px rgb(39, 39, 39);
+        margin-bottom: 30px;
     }
 
     #players {
@@ -152,24 +161,62 @@
         cursor: pointer;
     }
 
+    
+
 
 /* set invisible */ 
 
-#pTagPlayers {
+#gameUI {
     visibility: hidden;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
-#players {
-    visibility: hidden;
+#gameUI div {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #btnFinishRound {
     visibility: hidden;
+    margin-top: 20px;
 }
+
 
 #karten-section {
     visibility: hidden;
 }
+
+.oneplayer {
+    margin-top: 10px;
+    background-color: white;
+    border-radius: 10px;
+    
+    box-shadow: inset 0 0 10px #2a2a2a;
+}
+
+.oneplayer p {
+    margin-top: 10px;
+}
+
+#triggerCard7 {
+    margin-left: 50px;
+    margin-right: 50px;
+    border-color: rgb(202, 202, 202);
+    box-shadow: inset 0 0 10px #2a2a2a;
+    background-color: white;
+}
+
+#pTagPlayers {
+    font-size: 30px;
+    color: rgb(0, 0, 0);
+    margin-top: 20px;
+}
+
+#btnstartGame {
+    margin-bottom: 20px;
+}
+
 
 </style>
 
@@ -211,17 +258,26 @@
                 
 
                 <button id = 'btnJoin'>Join</button>
-                <button id = 'btnstartGame'> Start Game </button>
+                
                 
             </div>
         </div>
 
-        <p id="pTagPlayers">Mitspieler:</p>
+        <div id = 'gameUI'>
+            
 
-        <div id = "players"></div>
+            <p id="pTagPlayers"><b>Mitspieler</b></p>
 
-        <button id = "btnFinishRound">Finish</button>
+            <div id = "players"></div>
 
+            <button id = "btnFinishRound">Finish</button>
+
+            <hr style="width: 100px">
+
+            <button id = 'btnstartGame'> Start Game </button>
+
+        </div>
+        
         <div id="karten-section" class="karten-section">
 
             <div class="cardPlaceholder" id="triggerCard0">
@@ -266,6 +322,16 @@
                 </div>
             </div>
 
+            <div class="cardPlaceholder" id="triggerCard7">
+                <div id="cardPlace7" class="cardPlace"> 
+                    <img id= "pic7" src="">
+                </div>
+            </div>
+
+
+
+
+
         </div>
     </div>
     
@@ -307,10 +373,8 @@
             
             gameId = txtGameId.value;
 
-            document.getElementById("pTagPlayers").style.visibility = "visible"; 
-            document.getElementById("players").style.visibility = "visible"; 
-            document.getElementById("btnFinishRound").style.visibility = "visible"; 
-            document.getElementById("karten-section").style.visibility = "visible"; 
+            document.getElementById("startscreenbox").remove();
+            document.getElementById("gameUI").style.visibility = "visible"; 
 
             const payload = {
                 "method": "join",
@@ -343,6 +407,8 @@
                         "clientId": clientId
                         
                     }
+
+                    document.getElementById("btnFinishRound").style.visibility = "hidden"; 
                     ws.send(JSON.stringify(payLoad));
                     console.log("GESENDET!");
                 } else {
@@ -391,15 +457,20 @@
                     //building a Child inside of Playerlist
                     const d = document.createElement("div");
                     d.style.width = "200px";
-                    d.style.background = "yellow";
-                    d.textContent = c.username;
                     d.setAttribute("id", c.clientId);
                     d.setAttribute("class", "oneplayer");
+
+                    const t = document.createElement("p");
+                    t.textContent = c.username;
+                    d.appendChild(t);
+                    
                     c.divCard = d;
                     divPlayers.appendChild(d);
+
                     const p = document.createElement("progress");
-                    divPlayers.appendChild(p);
+                    d.appendChild(p);
                     p.setAttribute("id", c.clientId+"progress");
+
                 })
 
 
@@ -414,17 +485,22 @@
                 game.clients.forEach (c => {
                     
 
+                    
                     //building a Child inside of Playerlist
                     const d = document.createElement("div");
                     d.style.width = "200px";
-                    d.style.background = "yellow";
-                    d.textContent = c.username;
                     d.setAttribute("id", c.clientId);
                     d.setAttribute("class", "oneplayer");
+
+                    const t = document.createElement("p");
+                    t.textContent = c.username;
+                    d.appendChild(t);
+                    
                     c.divCard = d;
                     divPlayers.appendChild(d);
+
                     const p = document.createElement("progress");
-                    divPlayers.appendChild(p);
+                    d.appendChild(p);
                     p.setAttribute("id", c.clientId+"progress");
                 })
 
@@ -436,7 +512,9 @@
 
                 cards = response.cards;
                 const startHealth = response.startHealth;
-                document.getElementById("startscreenbox").style.visibility = "hidden"; 
+                document.getElementById("karten-section").style.visibility = "visible";  
+                btnstartGame.remove();
+                document.body.style.backgroundImage = "url(./images/Hintergrundbild.png)"
                 GAME(startHealth);
             }
 
@@ -476,10 +554,19 @@
                 document.getElementById(response.player).style.backgroundColor = "green";
 
                 
+
                 if (clientId == response.player) {
                     bistAuserwählt = true;
-                }
+                    console.log("DU BIST AUSERWÄHLT");
+                    document.getElementById("btnFinishRound").style.visibility = "visible";   
+                    
+                    console.log(cards);
 
+                    cards[7] = response.getCard;
+                    document.getElementById("pic7").style.visibility = "visible";
+                    document.getElementById("pic7").src="./images/" + cards[7] + ".png";
+                    
+                }
             }
 
 
@@ -640,7 +727,8 @@
             document.getElementById("cardPlace3"),
             document.getElementById("cardPlace4"),
             document.getElementById("cardPlace5"),
-            document.getElementById("cardPlace6")
+            document.getElementById("cardPlace6"),
+            document.getElementById("cardPlace7")
         ]
 
         const triggercard = [
@@ -650,7 +738,8 @@
             document.getElementById("triggerCard3"),
             document.getElementById("triggerCard4"),
             document.getElementById("triggerCard5"),
-            document.getElementById("triggerCard6")
+            document.getElementById("triggerCard6"),
+            document.getElementById("triggerCard7")
         ]
 
 
@@ -704,6 +793,13 @@
             }
         })
 
+        card[7].addEventListener("click", function () {
+            if (cardclickstate == 0 && bistAuserwählt == true) {
+                ausgewaelteCard = 7;
+                CardAngeklickt();
+            }
+        })
+
 
 
     //Triggercards
@@ -713,7 +809,6 @@
                 targetField = 0;
                 CardTriedToPlace();
             }
-
         })
 
         triggercard[1].addEventListener("click", function () {
@@ -828,12 +923,12 @@
     // FUNKTIONEN
 
         function aktualisierung() {
-            for (let i = 0; i<7 ; i++) {
+            for (let i = 0; i< 8 ; i++) {
                 if(cards[i] != null) {
                     document.getElementById("pic"+i).style.visibility = "visible";
                     document.getElementById("pic"+i).src="./images/" + cards[i] + ".png";
                 } else {
-                    //console.log("An Stelle " + i + " befindet sich keine Karte und wird deaktiviert.");
+                    console.log("An Stelle " + i + " befindet sich keine Karte und wird deaktiviert.");
                     document.getElementById("pic"+i).style.visibility = "hidden";
                 }
 
@@ -909,7 +1004,7 @@
             document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
 
             aktualisierung();
-            //console.log(cards);
+            console.log(cards);
 
             cardclickstate = 0;
 
