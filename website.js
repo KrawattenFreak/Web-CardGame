@@ -7,4 +7,4 @@ app.get("/", (req, res) => {
     console.log(res);
 
 })
-app.listen(9091, () => console.log("Listening on http port 9091"))
+app.listen(process.env.PORT || 9091, () => console.log("Listening on http port 9091"))
