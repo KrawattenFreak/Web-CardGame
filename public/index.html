@@ -164,68 +164,119 @@
     
 
 
-/* set invisible */ 
+    /* set invisible */ 
 
-#gameUI {
-    visibility: hidden;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.9);
-}
+    #gameUI {
+        visibility: hidden;
+        background-color: rgba(255, 255, 255, 0.9);
+        display: flex;
+    }
 
-#gameUI div {
-    margin-left: auto;
-    margin-right: auto;
-}
+    .UIsection1 {
+        padding: 20px;
+        text-align: left;
+        width: 50%;
+    }
 
-#btnFinishRound {
-    visibility: hidden;
-    margin-top: 20px;
-}
+    .header-console {
+        color: gray;
+        margin-top: 20px;
+        margin-bottom: 4px;
+    }
 
+    .UIsection1 div {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
 
-#karten-section {
-    visibility: hidden;
-}
+    #players {
+        display: flex;
+        flex-wrap: wrap;
+    }
 
-.oneplayer {
-    margin-top: 10px;
-    background-color: white;
-    border-radius: 10px;
-    
-    box-shadow: inset 0 0 10px #2a2a2a;
-}
-
-.oneplayer p {
-    margin-top: 10px;
-}
-
-#triggerCard7, #triggerCard8 {
-    margin-left: 50px;
-    margin-right: 50px;
-    border-color: rgb(202, 202, 202);
-    box-shadow: inset 0 0 10px #2a2a2a;
-    background-color: white;
-}
-
-#pTagPlayers {
-    font-size: 30px;
-    color: rgb(0, 0, 0);
-    margin-top: 20px;
-}
-
-#btnstartGame {
-    margin-bottom: 20px;
-}
+    .UIsection2 {
+        width: 50%;
+    }
 
 
-#cardPlace9 {
-    visibility: hidden;
-}
+    #btnFinishRound {
+        visibility: hidden;
+        margin-top: 20px;
+    }
 
-#hidden-section {
-    display: flex;
-    justify-content: center;
-}
+
+    #karten-section {
+        visibility: hidden;
+    }
+
+    .oneplayer {
+        margin-top: 10px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: inset 0 0 10px #2a2a2a;
+        text-align: center;
+    }
+
+
+    #triggerCard7, #triggerCard8 {
+        margin-left: 50px;
+        margin-right: 50px;
+        border-color: rgb(202, 202, 202);
+        box-shadow: inset 0 0 10px #2a2a2a;
+        background-color: white;
+    }
+
+    #pTagPlayers {
+        font-size: 30px;
+        color: rgb(0, 0, 0);
+        margin-top: 20px;
+    }
+
+    #btnstartGame {
+        margin-bottom: 20px;
+    }
+
+
+    #cardPlace9 {
+        visibility: hidden;
+    }
+
+    #hidden-section {
+        display: flex;
+        justify-content: center;
+    }
+
+    #console {
+        display: flex;
+        flex-direction: column;
+        align-items: baseline;
+        background-color: rgb(235, 235, 235);
+        width: 90%;
+        height: 150px;
+        overflow: auto;
+        box-shadow: inset 0 0 10px #bdbdbd;
+        padding: 20px;
+        box-sizing: border-box;
+        
+
+    }
+
+
+    #console p {
+    }
+
+    @media only screen and (min-width: 900px) {
+        .UIsection1 {
+            width: 100%;
+            padding: 30px 80px;
+        }
+        
+        .UIsection2 {
+            width: 400px;
+        }
+
+
+    }
 
 
 
@@ -276,16 +327,31 @@
 
         <div id = 'gameUI'>
             
+            
 
-            <p id="pTagPlayers"><b>Mitspieler</b></p>
 
-            <div id = "players"></div>
+            <div class="UIsection1">
+                <p id="pTagPlayers"><b>Mitspieler</b></p>
 
-            <button id = "btnFinishRound">Finish</button>
+                <div id = "players"></div>
 
-            <hr style="width: 100px">
+                <button id = "btnFinishRound">Finish</button>
 
-            <button id = 'btnstartGame'> Start Game </button>
+                <hr style="width: 100px; margin-left: 0;">
+
+                <button id = 'btnstartGame'> Start Game </button>
+            </div>
+
+            <div class="UIsection2">
+
+                <p class="header-console">Konsole:</p>
+
+                <div id="console">
+
+                </div>
+
+
+            </div>
 
         </div>
 
@@ -351,11 +417,6 @@
                 </div>
             </div>
 
-            
-
-
-
-
 
         </div>
     </div>
@@ -365,6 +426,7 @@
     <script>
         //HTML elements
         let cards = [];
+        let cardsSaved = [false, false, false, false, false, false, false, false, false];
         let inGame = false;
         let clientId = null;
         let gameId = null;
@@ -378,6 +440,10 @@
         const txtGameId = document.getElementById("iptGameId");
         const divPlayers = document.getElementById("players");
         const startGame = document.getElementById('startGame');
+        const consoleOutput = document.getElementById('console');
+
+        
+
 
         let game = null;
 
@@ -605,39 +671,114 @@
                 const validCardsForThief = [];
                 const stehlendeCardGlobal = null;
 
+                let thiefCardAvailable = false;
+                console.log("vor PayLoad " + thiefCardAvailable)
+
                 for (let i = 0; i < 7; i++) {
-                    if(cards[i] != null) {
+                    if(cards[i] != null && cardsSaved[i] == false) {
                         validCardsForThief.push([cards[i], i]);
+                        thiefCardAvailable = true;
+                        console.log("AUSGEFÜHRT")
                     }
                 }
 
                 const stehlendeKarte = Math.floor(Math.random() * (0 - validCardsForThief.length)) + validCardsForThief.length;
 
-                const payLoad = {
-                    "method": "thiefResClient",
-                    "card": cards[validCardsForThief[stehlendeKarte][1]],
-                    "game": gameId
+                
+                
+                if(thiefCardAvailable == true) {
+                    const payLoad = {
+                        "method": "thiefResClient",
+                        "card": cards[validCardsForThief[stehlendeKarte][1]],
+                        "game": gameId,
+                        "CardWasAvailable": true
+                    }
+                    ws.send(JSON.stringify(payLoad));
+
+                    cards[validCardsForThief[stehlendeKarte][1]] = null;
+
+                } else {
+                    const payLoad = {
+                        "method": "thiefResClient",
+                        "game": gameId,
+                        "CardWasAvailable": false
+                    }
+                    ws.send(JSON.stringify(payLoad));
                 }
 
-                ws.send(JSON.stringify(payLoad));
+                console.log("nach PayLoad " + thiefCardAvailable)
+                
 
-
-                cards[validCardsForThief[stehlendeKarte][1]] = null;
+                
 
                 aktualisierung();
 
             } if (response.method === "thiefResToSender") {
-                console.log("Die Karte, die du bekommst, ist " + response.receivedCard)
+                //console.log("Die Karte, die du bekommst, ist " + response.receivedCard)
 
 
-                
-                console.log()
                 cards[9] = response.receivedCard;
                 document.getElementById("pic"+9).src="./images/" + cards[9] + ".png";
                 aktualisierung();
                 
                 ausgewaelteCard = 9;
                 CardMoving();
+
+            } if (response.method === "spentCard") {
+
+                if(cardclickstate == 1) {
+                    cards[ausgewaelteCard] = response.card;
+                    document.getElementById("pic"+ausgewaelteCard).src="./images/" + cards[ausgewaelteCard] + ".png";
+
+
+                }else {
+
+                    cards[9] = response.card;
+                    document.getElementById("pic"+9).src="./images/" + cards[9] + ".png";
+                    aktualisierung();
+                    
+                    ausgewaelteCard = 9;
+                    CardMoving();
+                }
+            
+            } if (response.method === "healMax") {
+
+                document.getElementById(response.target+"progress").setAttribute("max", response.maxhealth);
+
+            } if (response.method === "revived") {
+
+                game.clients.forEach (c => {
+                    if(c.clientId == response.target) {
+                        c.health = 200;
+                    }
+                })
+
+                document.getElementById(response.target+"progress").setAttribute("value", 200);
+                document.getElementById(response.target+"progress").style.removeProperty('background-color');
+
+            } if (response.method === "consoleOutput") {
+
+                const scrollToBottom = (node) => {
+                	node.scrollTop = node.scrollHeight;
+                }
+
+
+                const p = document.createElement("p");
+                p.textContent = response.message;
+                p.style.color = response.color;
+                consoleOutput.appendChild(p);
+
+                scrollToBottom(consoleOutput);
+                
+            } if (response.method === "showCardsBecauseSpion") {
+
+                const payLoad = {
+                    "method": "ForSpionResponse",
+                    "cards": cards,
+                    "game": gameId
+                }
+
+                ws.send(JSON.stringify(payLoad));
 
             }
 
@@ -933,32 +1074,174 @@
             document.getElementById(c.clientId+"progress").setAttribute("max", maxVisibleProg);
             document.getElementById(c.clientId+"progress").setAttribute("value", c.health);
             
-                    
-
-
-
-
-
-
-
-            
+     
             c.divCard.addEventListener("click", e => { 
                 if(cardclickstate == 1) {
                     //console.log("Angriff auf " + c.username + ".");
 
-                    if(c.health > 0) {
+                    console.log(cards)
 
-                     
-                        const payload = {
-                            "method": "attack",
-                            "card": cards[ausgewaelteCard],
-                            "target": c.clientId,
-                            "game": gameId,
-                            "sender": clientId
+                    if(c.health > 0) {
+                    if(cards[ausgewaelteCard] !== "DemoKarte_-6"){
+
+
+                        if(cards[ausgewaelteCard] == "DemoKarte_-2") {
+                        
+                            
+                            let spentCardAusgewaehlt = prompt("Welche Karte möchtest du versenden? (1 - 7)", "");
+                            if(spentCardAusgewaehlt === null) {
+                                //AUF CANCEL GEKLICKT
+
+                            } else {
+                                if (cards[spentCardAusgewaehlt-1] !== null) {
+                                    //KARTENPLATZ WAR LEER, DESHALB NICHT VERSENDUNG
+
+                                    const payload = {
+                                        "method": "attack",
+                                        "card": cards[ausgewaelteCard],
+                                        "target": c.clientId,
+                                        "game": gameId,
+                                        "sender": clientId,
+                                        "spentCard": cards[spentCardAusgewaehlt-1]
+                                    }
+
+                                    ws.send(JSON.stringify(payload));
+
+                                    cards[spentCardAusgewaehlt-1] = null;
+                                    cards[ausgewaelteCard] = null;
+
+                                }
+                            }
+
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-1") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-3") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+                            
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-10") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-11") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+                        
+
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-5") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-4") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-9") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+                        
+                        } else if(cards[ausgewaelteCard] == "DemoKarte_-7") {
+
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+
+
+
+                            //WENN GANZ NORMALE ANGRIFFSKARTE
+                        } else if(cards[ausgewaelteCard].slice(10, 11) !== "-") {
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
                         }
 
 
-                        ws.send(JSON.stringify(payload));
+                        
 
                         document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
                         ausgewaelteCardSelected = false;
@@ -966,23 +1249,52 @@
                         document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('left');
                         document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
 
-                        cards[ausgewaelteCard] = null;
+                        
 
                         aktualisierung();
 
-                        console.log(cards);
+                        //console.log(cards);
 
                         cardclickstate = 0;
 
+                    }
+                    } else if(c.health <= 0) {
+                    
+                        if(cards[ausgewaelteCard] == "DemoKarte_-6") {
 
+                            console.log("JAO");
+                            const payload = {
+                                "method": "attack",
+                                "card": cards[ausgewaelteCard],
+                                "target": c.clientId,
+                                "game": gameId,
+                                "sender": clientId
+                            }
+    //
+                            ws.send(JSON.stringify(payload));
+                            cards[ausgewaelteCard] = null;
+                        } 
 
-                    } else {
-                        console.log("Der Spieler ist bereits tot.")
+                        
+
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
+                        ausgewaelteCardSelected = false;
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "1";
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('left');
+                        document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
+
+                        
+
+                        aktualisierung();
+
+                        //console.log(cards);
+
+                        cardclickstate = 0;
+                
+
                     }
 
                 }
-                
-
             })
         })
 
@@ -1019,24 +1331,52 @@
                     if(c == cards[targetField]) {
                         cards[targetField] = cardDictionary[cards[ausgewaelteCard]][cards[targetField]];
                         commonFound = true;
+                    
                     } else {
                         
                     }
 
                 }
 
+                console.log(cards[ausgewaelteCard])
+                console.log(cards[targetField])
+
+
                 if (commonFound == false) {
-                    cards[targetField] = cards[ausgewaelteCard];
+                    
+
+                    if(cards[ausgewaelteCard] == cards[targetField]) {
+                        cards[targetField] = "DemoKarte_-3";
+                        console.log(cards[targetField])
+
+                    } else if(cards[ausgewaelteCard] == "DemoKarte_-8" && cards[targetField] !== null) {
+
+                        document.getElementById("cardPlace" + targetField).style.opacity = "0.5";
+                        cardsSaved[targetField] = true;
+                        
+                        
+
+                    } else {
+                        cards[targetField] = cards[ausgewaelteCard];
+
+                        cardsSaved[targetField] = cardsSaved[ausgewaelteCard];
+                        cardsSaved[ausgewaelteCard] = false;
+
+                        console.log(cardsSaved)
+                    }
                     
                 } else {
                     commonFound = false;
                 }
 
                 cards[ausgewaelteCard] = null;
-                
+
+
             } else {
 
             }
+
+            
 
 
             ausgewaelteCardSelected = false;
@@ -1070,6 +1410,18 @@
                     //console.log("An Stelle " + i + " befindet sich keine Karte und wird deaktiviert.");
                     document.getElementById("pic"+i).style.visibility = "hidden";
                 }
+
+            }
+
+            for (let i = 0; i< 7 ; i++) {
+
+                if(cardsSaved[i] == true) {
+                    document.getElementById("cardPlace" + i).style.opacity = "0.5";
+                }
+                if(cardsSaved[i] == false) {
+                    document.getElementById("cardPlace" + i).style.opacity = "1";
+                }
+
 
             }
     }
