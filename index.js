@@ -6,7 +6,7 @@ const { connection } = require("websocket");
 
 const websocketServer = require("websocket").server
 const httpServer = http.createServer();
-const port = process.env.PORT || 9090;
+const port = process.env.PORT //|| 9090;
 
 //
 httpServer.listen(port, () => console.log("WEBSOCKET GESTARTET AUF PORT " + port))
