@@ -261,6 +261,10 @@
 
     }
 
+    #failed {
+        margin-bottom: 10px;
+    }
+
 
     @media only screen and (min-width: 900px) {
         .UIsection1 {
@@ -311,9 +315,10 @@
             <div class="section1">
                 <p class="title2">Spiel beitreten</p>
 
-
                 <input id = 'iptUsername' type="text" placeholder="Username">
                 <input id = 'iptGameId' type="text" placeholder="Game-ID">
+
+                <p id="failed"></p>
                 
 
                 <button id = 'btnJoin'>Join</button>
@@ -429,7 +434,7 @@
         let gameId = null;
         let maxVisibleProg = 2000;
         let bistAuserwählt = false;
-        let ws = new WebSocket("ws://localhost:9090")
+        let ws = new WebSocket("wss://localhost:9090")
         const btnCreate = document.getElementById("btnCreate");
         const btnJoin = document.getElementById("btnJoin");
         const btnFinishRound = document.getElementById("btnFinishRound");
@@ -528,6 +533,9 @@
             if (response.method === "joinRES") {
                 if (response.valid == false) {
                     console.log("Du bist echt kernbehindert");
+                    document.getElementById("failed").textContent = "Der Code ist ungültig.";
+                    document.getElementById("failed").style.color = "red";
+
                 }
 
                 if (response.valid == true) {

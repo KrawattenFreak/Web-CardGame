@@ -1,3 +1,13 @@
-const arr = ["name", "alter", ["alter2", "alter3"]]
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-console.log(arr[2][1])
+function generateID(length) {
+    let result = '';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+}
+
+console.log(generateString(5));
