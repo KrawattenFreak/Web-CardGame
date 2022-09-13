@@ -1,0 +1,190 @@
+h1, p {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0px;
+    margin: 0px;
+}
+
+h1 {
+    color:white;
+    padding-bottom: 4px;
+}
+
+body {
+    background-image: url(../images/Hintergrundbild.png);
+    margin: 0;
+    padding: 0;
+
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+}
+
+.karten-section img, .cardPlace, .cardPlaceholder, #hidden-section img {
+    width: 140px;
+    height: 210px;
+    
+}
+
+
+.cardPlace:hover {
+    cursor: grab;
+}
+
+.cardPlace {
+    position: absolute;
+    
+}
+
+.cardPlace img {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+
+    -webkit-user-drag: none; 
+    -khtml-user-drag: none; 
+    -moz-user-drag: none; 
+    -o-user-drag: none; 
+
+}
+
+.karten-section {
+    display: flex;
+    flex-wrap: wrap;  
+    justify-content: center;
+    margin-top: 200px;
+}
+
+.cardPlaceholder {
+    border-style: solid;
+    border-color: rgb(41, 41, 41);
+    border-radius: 7px;
+    margin: 0 6px;
+    box-shadow: 0px 5px 10px rgb(39, 39, 39);
+    margin-bottom: 30px;
+}
+
+#players {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+
+/*----------------------------*/
+
+
+
+
+
+#gameUI {
+    
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+}
+
+.UIsection1 {
+    padding: 20px;
+    text-align: left;
+    width: 50%;
+}
+
+.header-console {
+    color: gray;
+    margin-top: 20px;
+    margin-bottom: 4px;
+}
+
+.UIsection1 div {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#players {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.UIsection2 {
+    width: 50%;
+}
+
+
+#btnFinishRound {
+    
+    margin-top: 20px;
+}
+
+
+#karten-section {
+    
+}
+
+.oneplayer {
+    margin-top: 10px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px #2a2a2a;
+    text-align: center;
+}
+
+
+#triggerCard7, #triggerCard8 {
+    margin-left: 50px;
+    margin-right: 50px;
+    border-color: rgb(202, 202, 202);
+    box-shadow: inset 0 0 10px #2a2a2a;
+    background-color: white;
+}
+
+#pTagPlayers {
+    font-size: 30px;
+    color: rgb(0, 0, 0);
+    margin-top: 20px;
+}
+
+#btnstartGame {
+    margin-bottom: 20px;
+}
+
+
+#cardPlace9 {
+    
+}
+
+#hidden-section {
+    display: flex;
+    justify-content: center;
+}
+
+#console {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    background-color: rgb(235, 235, 235);
+    width: 90%;
+    height: 150px;
+    overflow: auto;
+    box-shadow: inset 0 0 10px #bdbdbd;
+    padding: 20px;
+    box-sizing: border-box;
+    
+
+}
+
+#failed {
+    margin-bottom: 10px;
+}
+
+
+@media only screen and (min-width: 900px) {
+    .UIsection1 {
+        width: 100%;
+        padding: 30px 80px;
+    }
+    
+    .UIsection2 {
+        width: 400px;
+    }
+
+
+}

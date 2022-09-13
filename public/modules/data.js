@@ -1,24 +1,4 @@
-
-const res = require("express/lib/response");
-const { redirect } = require("express/lib/response");
-const http = require("http");
-const { connection } = require("websocket");
-
-const websocketServer = require("websocket").server
-const httpServer = http.createServer();
-const port = process.env.PORT || 9090;
-
-//
-httpServer.listen(port, () => console.log("WEBSOCKET GESTARTET AUF PORT " + port))
-
-
-const wsServer = new websocketServer({
-    "httpServer": httpServer
-})
-
-
-
-const damagecard = {
+export const damagecard = {
     "DemoKarte_0": 50,
     "DemoKarte_1": 60,
     "DemoKarte_2": 50,
@@ -51,7 +31,8 @@ const damagecard = {
 
 }
 
-const cardNameDictionary = {
+
+export const cardNameDictionary = {
     "DemoKarte_0": "Mysteriöser Molch",
     "DemoKarte_1": "Zerstückelter Zombie",
     "DemoKarte_2": "Marcel Davis",
@@ -93,60 +74,3 @@ const cardNameDictionary = {
     "DemoKarte_-10": "Salzwunde",
     "DemoKarte_-11": "Spigghel"
 };
-
-const games = {};
-
-
-
-wsServer.on("request", request => {
-
-    const connection = request.accept(null, request.origin);
-    connection.on("resume", () => {
-        console.log("Jemand hat sich mit WS verbunden.")
-
-        
-    })
-
-    connection.on("close", () => {
-        console.log("Jemand hat sich mit WS getrennt.");
-
-    })
-
-    connection.on("message", message => {
-
-        const result = JSON.parse(message.utf8Data)
-
-        if (result.method === "create") {
-            const gameID = generateID(5);
-            games[gameID] = {
-                "gameID": gameID,
-                "clients": {}
-            }
-
-            console.log(games)
-
-
-        }
-
-        if (result.method === "join") {
-
-        
-        }
-    })
-
-})
-
-
-
-
-//ID GENERATOR FUNCTION
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-function generateID(length) {
-    let result = '';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
-//-------------------------
