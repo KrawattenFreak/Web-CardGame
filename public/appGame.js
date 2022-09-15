@@ -4,6 +4,16 @@
 
 //---------------------------
 
+//DOM ELEMENTS---------------
+
+
+
+
+
+
+
+//---------------------------
+
 //CODE TO PREVENT ATTEMPS SENDING MESSAGES TO A CLOSED WEBSOCKET  -> .sendMessage()
 let ws = new WebSocket("ws://localhost:9090")
 const waitForOpenConnection = (socket) => {
@@ -40,7 +50,7 @@ const sendMessage = async (socket, msg) => {
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
-if (urlParams.has("username") == true && urlParams.has("userID") == true) {
+if (urlParams.has("username") == true && urlParams.has("gameID") == true) {
 
 } else {
     console.error("Du URL MANIPULATOR")
@@ -50,20 +60,22 @@ if (urlParams.has("username") == true && urlParams.has("userID") == true) {
 //START---------------------------------------------------------------------------
 
 let payLoad = {
-    "method": "test",
+    "method": "join",
     "username": urlParams.get("username"),
-    "userID": urlParams.get("userID")
+    "gameID": urlParams.get("gameID")
 }
 
 sendMessage(ws, JSON.stringify(payLoad))
 
+ws.onmessage = message => {
+    //message.data 
+    const response = JSON.parse(message.data);
 
+    if(response.method === "clientJoined") {
+        console.log(response.username + " hat sich mit der ID " + response.playerID + " verbunden.")
+    }
+
+}
 
 let cards = [];
-
-
-
-
-
-
 
