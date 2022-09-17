@@ -3,23 +3,19 @@ class gameInstance {
         this.gameID = gameID
     }
 
-    clients = []
-
-    playerJoin(client) {
-        this.clients.push(client)
-    }
+    //clients = {}
 
 
 
     //SEND MESSAGES TO ALL PLAYERS
     clientJoined(client) {
-        this.clients.push(client)
+        //this.clients[client.]
 
         let payLoad = {
             "method": "clientJoined",
             "username": client.username,
             "playerID": client.playerID,
-            "clients": this.clients
+            //"clients": this.clients
         }
 
         this.clients.forEach(c => {
