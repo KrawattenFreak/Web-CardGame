@@ -6,7 +6,7 @@
 
 //DOM ELEMENTS---------------
 
-
+const consoleOutput = document.getElementById('console');
 
 
 
@@ -72,9 +72,26 @@ ws.onmessage = message => {
     const response = JSON.parse(message.data);
 
     if(response.method === "clientJoined") {
-        console.log(response.username + " hat sich mit der ID " + response.playerID + " verbunden.")
+        console.log(response.client)
     }
 
+    if(response.method === "getYourPersonalSickID") {
+        console.log("Your personal ID is: " + response.personalID + ".")
+    }
+    
+    if(response.method === "consoleOutput") {
+        const scrollToBottom = (node) => {
+            node.scrollTop = node.scrollHeight;
+        }
+
+
+        const p = document.createElement("p");
+        p.textContent = response.message;
+        p.style.color = response.color;
+        consoleOutput.appendChild(p);
+
+        scrollToBottom(consoleOutput);
+    }
 }
 
 let cards = [];

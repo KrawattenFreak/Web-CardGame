@@ -64,6 +64,7 @@
     document.getElementById("btnJoin").addEventListener("click", joinGame)
     let inputUsername = document.getElementById("iptUsername")
     let inputGameID = document.getElementById("iptGameId")
+    let gameDOMID = document.getElementById("pgameid")
     //-------------
 
     //WEBSOCKET
@@ -103,8 +104,10 @@
         const response = JSON.parse(message.data);
 
         if(response.method === "createGameRes") {
-            console.log(response.gameID)
+            console.log(gameDOMID)
+            gameDOMID.innerText = response.gameID
         }
+
 
     }
 

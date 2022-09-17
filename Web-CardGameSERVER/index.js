@@ -67,9 +67,11 @@ wsServer.on("request", request => {
         }
 
 
+
         if(result.method === "join") {
             const createClientID = generate.ID(12)
-            const joinedClient = new clientClass(createClientID, connection, result.username)
+            const createPublicClientID = generate.ID(8)
+            const joinedClient = new clientClass(createClientID, connection, result.username, createPublicClientID)
             games[result.gameID].clientJoined(joinedClient)
         }
 
