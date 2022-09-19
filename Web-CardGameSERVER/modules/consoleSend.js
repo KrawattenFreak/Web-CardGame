@@ -1,4 +1,4 @@
-function consoleOutput(game, message, color) {
+function consoleOutput(connection, message, color) {
     
     let consolePayLoad = {
         "method": "consoleOutput",
@@ -6,9 +6,8 @@ function consoleOutput(game, message, color) {
         "color": color
     }
 
-    game.clients.forEach(c => {
-        c.connection.send(JSON.stringify(consolePayLoad))
-    })
+    connection.send(JSON.stringify(consolePayLoad))
+    
 
 }
 module.exports = consoleOutput

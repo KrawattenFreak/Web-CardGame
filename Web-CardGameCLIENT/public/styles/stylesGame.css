@@ -188,3 +188,9 @@ body {
 
 
 }
+
+/*----------------VISIBILITY-----------------*/
+
+.cardPlace {
+    display: none;
+}

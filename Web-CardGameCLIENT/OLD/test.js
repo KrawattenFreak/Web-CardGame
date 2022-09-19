@@ -1,13 +1,23 @@
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//
+//function generateID(length) {
+//    let result = '';
+//    const charactersLength = characters.length;
+//    for ( let i = 0; i < length; i++ ) {
+//        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+//    }
+//
+//    return result;
+//}
+//
+//console.log(generateString(5));
 
-function generateID(length) {
-    let result = '';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
 
-    return result;
+var obj = {
+    "123": "Lola",
+    "456": "Lolar"
 }
 
-console.log(generateString(5));
+for (e in obj) {
+    console.log(e)
+}

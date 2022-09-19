@@ -8,6 +8,8 @@ var generate = require('./modules/generate.js');
 var data = require('./modules/data')
 var gameClass = require('./modules/gameClass.js')
 var clientClass = require('./modules/clientClass.js')
+var cardClass = require('./modules/cardClass.js')
+var getInformationFromConnection = require('./modules/getInformationConnection.js')
 
 
 
@@ -69,10 +71,28 @@ wsServer.on("request", request => {
 
 
         if(result.method === "join") {
-            const createClientID = generate.ID(12)
-            const createPublicClientID = generate.ID(8)
-            const joinedClient = new clientClass(createClientID, connection, result.username, createPublicClientID)
-            games[result.gameID].clientJoined(joinedClient)
+            //Query if game with gameID exists
+
+            if(result.gameID in games) {
+                const createClientID = generate.ID(12)
+                const createPublicClientID = generate.ID(8)
+                const joinedClient = new clientClass(createClientID, connection, result.username, createPublicClientID)
+                games[result.gameID].clientJoined(joinedClient)
+
+            } else {
+                let payLoad = {
+                    "method": "errorNoGameWithGameID",
+                    "gameID": result.gameID
+                }
+                connection.send(JSON.stringify(payLoad))
+            }
+
+
+            
+        }
+
+        if (result.method === "startGame") {
+            console.log(getInformationFromConnection(connection, games))
         }
 
         

@@ -4,7 +4,15 @@ class playerInstance {
         this.playerID_public = playerID_public
         this.connection = connection
         this.username = username
+
+        this.cards = [];
+        for (let i = 0; i < 9; i++) {
+            this.cards[i] = null
+        }
+
     }
+
+    
 
     
 

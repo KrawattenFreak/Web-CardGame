@@ -62,6 +62,7 @@
     //DOM ELEMENTS
     document.getElementById("btnCreate").addEventListener("click", createGame)
     document.getElementById("btnJoin").addEventListener("click", joinGame)
+    let failed = document.getElementById("failed")
     let inputUsername = document.getElementById("iptUsername")
     let inputGameID = document.getElementById("iptGameId")
     let gameDOMID = document.getElementById("pgameid")
@@ -99,12 +100,25 @@
     }
     //-------------
 
+    //ERROR MANAGEMENT PARAMS
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.has("error") == true) {
+        failed.innerHTML = "Da haste reingeschissen. Es gibt kein Spiel mit der GameID: " + urlParams.get("error") + "."
+    }
+
+
+
+    //----------------------
+
+
+
     ws.onmessage = message => {
         //message.data 
         const response = JSON.parse(message.data);
 
         if(response.method === "createGameRes") {
-            console.log(gameDOMID)
             gameDOMID.innerText = response.gameID
         }
 

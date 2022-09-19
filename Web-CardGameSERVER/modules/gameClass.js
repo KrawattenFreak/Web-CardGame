@@ -12,11 +12,12 @@ class gameInstance {
 
     clientsSend = {}
 
-    //SEND MESSAGES TO ALL PLAYERS
+
     clientJoined(client) {
+        
         this.clients.push(client)
     
-
+        //Clients Send registered + transmitted + ConsoleSend
         this.clients.forEach(c => {
             this.clientsSend[c.playerID_public] = c.username
         })
@@ -28,7 +29,9 @@ class gameInstance {
 
         this.clients.forEach(c => {
             c.connection.send(JSON.stringify(payLoad))
+            consoleSend(c.connection, client.username + " hat das Spiel betreten.", "BLUE")
         })
+        //----------------------------------------
 
         payLoad = {
             "method": "getYourPersonalSickID",
@@ -36,7 +39,7 @@ class gameInstance {
         }
         client.connection.send(JSON.stringify(payLoad))
 
-        consoleSend(this, "Na schön", "RED")
+        
 
     }
 
