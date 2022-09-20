@@ -1,6 +1,6 @@
 //IMPORT MY MODULES------------------
 var consoleSend = require('./consoleSend.js');
-
+var cardClass = require('./cardClass.js');
 
 
 class gameInstance {
@@ -40,6 +40,32 @@ class gameInstance {
         client.connection.send(JSON.stringify(payLoad))
 
         
+
+    }
+
+
+    gameStart() {
+
+        
+
+        this.clients.forEach(c => {
+            consoleSend(c.connection, "Das Spiel wurde gestartet. Mach dich Bereit!", "ORANGE")
+            c.cards[0] = new cardClass()
+            c.cards[1] = new cardClass()
+
+            c.cards[0].generateRandomCard()
+            c.cards[1].generateRandomCard()
+
+            let payLoad = {
+                "method": "refreshCards",
+                "cards": c.cards
+            }
+
+            c.connection.send(JSON.stringify(payLoad))
+
+        })
+
+        console.log(this.clients)
 
     }
 

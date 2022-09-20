@@ -1,20 +1,26 @@
 function getInformationFromConnection(connection, games) {
-    for (a in games) {
-        
-
-        
-        games[a].clients.forEach (b=> {
-            
-
-        })
+    let bArr = []
     
+    for (a in games) {
+        games[a].clients.forEach (b=> {
+            if (b.connection == connection) {
+                bArr.push(b)
+            }
+        })
     }
-       
-           
-        //    if(b.connection == connection) {
-               
-        //    }
-       
+
+    if(bArr.length = 1) {
+        return {
+            "gameID": a,
+            "playerDetails": bArr[0]
+        }
+
+
+    } else {
+
+        //WENN ES MEHR ALS ZWEI CONNECTIONS GIBT
+
+    }
 
     
 }

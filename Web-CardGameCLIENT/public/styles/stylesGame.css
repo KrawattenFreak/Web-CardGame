@@ -191,6 +191,6 @@ body {
 
 /*----------------VISIBILITY-----------------*/
 
-.cardPlace {
+.cardPlace img {
     display: none;
 }

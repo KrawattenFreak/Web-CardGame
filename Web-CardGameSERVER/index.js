@@ -92,7 +92,8 @@ wsServer.on("request", request => {
         }
 
         if (result.method === "startGame") {
-            console.log(getInformationFromConnection(connection, games))
+            games[getInformationFromConnection(connection, games).gameID].gameStart()
+
         }
 
         
