@@ -14,6 +14,25 @@ class playerInstance {
 
     
 
+
+    cardMove(ausgewaehlteCard, targetCard) {
+        this.cards[targetCard] = this.cards[ausgewaehlteCard]
+        if (targetCard != ausgewaehlteCard) {
+            this.cards[ausgewaehlteCard] = null
+        }
+        
+
+        let payLoad = {
+            "method": "refreshCards",
+            "cards": this.cards
+        }
+
+        this.connection.send(JSON.stringify(payLoad))
+
+    }
+
+    
+
     
 
 }

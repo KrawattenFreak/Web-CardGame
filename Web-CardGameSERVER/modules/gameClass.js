@@ -1,16 +1,20 @@
 //IMPORT MY MODULES------------------
 var consoleSend = require('./consoleSend.js');
 var cardClass = require('./cardClass.js');
+var getClientBySID = require('./getClientBySID.js');
 
 
 class gameInstance {
     constructor(gameID) {
         this.gameID = gameID
+        this.gameState = "opened"
     }
 
     clients = []
 
     clientsSend = {}
+
+    playerTurn = null
 
 
     clientJoined(client) {
@@ -38,16 +42,40 @@ class gameInstance {
             "personalID": client.playerID
         }
         client.connection.send(JSON.stringify(payLoad))
+    }
 
+    replaceClient(secretID, connection) {
         
+        let payLoad = {
+            "method": "errorAnotherSession"
+        }
+        
+        getClientBySID(this.clients, secretID).connection.send(JSON.stringify(payLoad))
 
+        getClientBySID(this.clients, secretID).connection.close()
+        
+        getClientBySID(this.clients, secretID).connection = connection
+        payLoad = {
+            "method": "clientJoined",
+            "client": this.clientsSend
+        }
+
+        connection.send(JSON.stringify(payLoad))
+
+        payLoad = {
+            "method": "refreshCards",
+            "cards": getClientBySID(this.clients, secretID).cards,
+            "isGameStart": true
+        }
+
+        connection.send(JSON.stringify(payLoad))
+
+        consoleSend(connection, "Spieler " + getClientBySID(this.clients, secretID).username + " wurde neu geladen.", "RED")
     }
 
 
     gameStart() {
-
-        
-
+        this.gameState = "ingame"
         this.clients.forEach(c => {
             consoleSend(c.connection, "Das Spiel wurde gestartet. Mach dich Bereit!", "ORANGE")
             c.cards[0] = new cardClass()
@@ -58,14 +86,46 @@ class gameInstance {
 
             let payLoad = {
                 "method": "refreshCards",
-                "cards": c.cards
+                "cards": c.cards,
+                "isGameStart": true,
+                "officialGameStart": true
             }
 
             c.connection.send(JSON.stringify(payLoad))
 
         })
 
-        console.log(this.clients)
+        this.playerTurn = -1
+        this.nextPlayer()
+
+    }
+
+    nextPlayer() {    
+
+        //Wiederholverfahren
+        this.playerTurn += 1
+        if(this.clients[this.playerTurn] == null) {
+            this.playerTurn = 0
+        }
+
+
+            
+        this.clients.forEach(c => {
+
+            let payLoad = {
+                "method": "playerTurn",
+                "playerPublicID": this.clients[this.playerTurn].playerID_public
+            }
+
+            c.connection.send(JSON.stringify(payLoad))
+
+        })
+
+        
+
+        
+     
+        
 
     }
 

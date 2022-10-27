@@ -10,6 +10,7 @@ var gameClass = require('./modules/gameClass.js')
 var clientClass = require('./modules/clientClass.js')
 var cardClass = require('./modules/cardClass.js')
 var getInformationFromConnection = require('./modules/getInformationConnection.js')
+var isSIDClientInGame = require('./modules/isSIDClientInGame.js')
 
 
 
@@ -49,7 +50,6 @@ wsServer.on("request", request => {
     })
 
     connection.on("message", message => {
-
         const result = JSON.parse(message.utf8Data)
 
         if (result.method === "createGame") {
@@ -74,10 +74,41 @@ wsServer.on("request", request => {
             //Query if game with gameID exists
 
             if(result.gameID in games) {
-                const createClientID = generate.ID(12)
-                const createPublicClientID = generate.ID(8)
-                const joinedClient = new clientClass(createClientID, connection, result.username, createPublicClientID)
-                games[result.gameID].clientJoined(joinedClient)
+                
+
+                //CHECK IF PLAYER HAS A SECRETID
+                if(result.secretID == null) {
+
+                    if(games[getInformationFromConnection(connection, games).gameID].gameState == "opened") {
+
+                        const createClientID = generate.ID(12)
+                        const createPublicClientID = generate.ID(8)
+                        const joinedClient = new clientClass(createClientID, connection, result.username, createPublicClientID)
+                        games[result.gameID].clientJoined(joinedClient)
+
+                    } else {
+                        let payLoad = {
+                            "method": "errorGameStarted",
+                        }
+                        connection.send(JSON.stringify(payLoad))
+                    }
+
+
+                } else {
+
+                    if(isSIDClientInGame(result.secretID, games[result.gameID].clients) == true) {
+
+                        games[result.gameID].replaceClient(result.secretID, connection)
+                    } else {
+
+                        let payLoad = {
+                            "method": "errorNoUserWithSecretID",
+                            "secretID": result.secretID
+                        }
+                        connection.send(JSON.stringify(payLoad))
+                    }
+                }
+                
 
             } else {
                 let payLoad = {
@@ -92,8 +123,33 @@ wsServer.on("request", request => {
         }
 
         if (result.method === "startGame") {
-            games[getInformationFromConnection(connection, games).gameID].gameStart()
+            if(games[getInformationFromConnection(connection, games).gameID].gameState == "opened") {
+                games[getInformationFromConnection(connection, games).gameID].gameStart()
+            } else {
+                let payLoad = {
+                    "method": "errorGameAlreadyStarted",
+                }
+                connection.send(JSON.stringify(payLoad))
+            }
+            
 
+        }
+
+        if(result.method === "finishRound") {
+            const currentGame = games[getInformationFromConnection(connection, games).gameID]
+            
+            if (currentGame.clients[currentGame.playerTurn].playerID == getInformationFromConnection(connection, games).playerDetails.playerID) {
+                currentGame.nextPlayer()
+            } else {
+                let payLoad = {
+                    "method": "errorNotYourTurn"
+                }
+                connection.send(JSON.stringify(payLoad))
+            }
+        }
+
+        if (result.method === "cardMove") {
+            getInformationFromConnection(connection, games).playerDetails.cardMove(result.ausgewaehlteCard, result.targetCard)
         }
 
         
@@ -101,7 +157,3 @@ wsServer.on("request", request => {
     })
 
 })
-
-
-
-

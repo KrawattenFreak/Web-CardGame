@@ -9,6 +9,7 @@ import { refreshCards } from "./modules/refreshCards.js";
 const consoleOutput = document.getElementById('console');
 const divPlayers = document.getElementById("players");
 document.getElementById('btnstartGame').addEventListener("click", startGame);
+document.getElementById('btnFinishRound').addEventListener("click", finishRound)
 
 const cardDOM = [
     document.getElementById("cardPlace0"),
@@ -86,12 +87,18 @@ if (urlParams.has("username") == true && urlParams.has("gameID") == true) {
 
 //START---------------------------------------------------------------------------
 let cards = []
+let clients = []
 
+let hasSecretID = null;
+if(urlParams.has("secretID") == true) {
+    hasSecretID = urlParams.get("secretID")
+}
 
 let payLoad = {
     "method": "join",
     "username": urlParams.get("username"),
-    "gameID": urlParams.get("gameID")
+    "gameID": urlParams.get("gameID"),
+    "secretID": hasSecretID
 }
 
 sendMessage(ws, JSON.stringify(payLoad))
@@ -100,10 +107,33 @@ ws.onmessage = message => {
     //message.data 
     const response = JSON.parse(message.data);
 
+    if(response.method === "errorGameAlreadyStarted") {
+        console.error("Du dummer Mensch. Die Runde hat schon begonnen.")
+    }
+
+    if(response.method === "errorNotYourTurn") {
+        console.error("Du bist nicht dran du Wesen.")
+    }
+
     if(response.method === "errorNoGameWithGameID") {
         
         window.location.href = window.location.origin + "?error=" + response.gameID
         console.error("Kein Spiel mit der GameID " + response.gameID + " gefunden.")
+    }
+
+    if(response.method === "errorNoUserWithSecretID") {
+        window.location.href = window.location.origin + "?errorSID=" + response.secretID
+        console.error("Kein User mit der ID " + response.secretID + " gefunden.")
+    }
+
+    if(response.method === "errorGameStarted") {
+        window.location.href = window.location.origin + "?errorGameStarted=" + true
+        console.error("Das Spiel " + response.gameID + " wurde schon gestartet.")
+    }
+
+    if(response.method === "errorAnotherSession") {
+        window.location.href = window.location.origin + "?errorAnotherSession=" + true
+        console.error("Du wurdest ersetzt.")
     }
 
     if(response.method === "clientJoined") {
@@ -113,9 +143,8 @@ ws.onmessage = message => {
         divPlayers.removeChild(divPlayers.firstChild)
 
         Object.keys(response.client).forEach (c => {
-
-        
             console.log(c)
+            clients.push(c)
 
             //building a Child inside of Playerlist
             const d = document.createElement("div");
@@ -141,6 +170,7 @@ ws.onmessage = message => {
 
     if(response.method === "getYourPersonalSickID") {
         console.log("Your personal ID is: " + response.personalID + ".")
+        window.history.pushState("", "", '/game?username='+urlParams.get("username")+'&gameID='+ urlParams.get("gameID") +'&secretID='+response.personalID)
     }
     
     if(response.method === "consoleOutput") {
@@ -157,10 +187,25 @@ ws.onmessage = message => {
     }
 
     if(response.method === "refreshCards") {
-        console.log(response.cards)
         refreshCards(response.cards)
+        if(response.isGameStart != true)  {
+            CardReset()
+        }
+        
+        //DAS HIER BITTE DORT EINBAUEN WO DIE ZÜGE GEMANAGED WERDEN
+        if(response.officialGameStart == true) {
+            
+            resetPlayerAmZug()
+
+        }
 
         cards = response.cards
+    }
+
+    if(response.method === "playerTurn") {
+        resetPlayerAmZug()
+        document.getElementById(response.playerPublicID).style.background = "green";
+        document.getElementById(response.playerPublicID).style.color = "white";
     }
 
 }
@@ -177,6 +222,8 @@ let ausgewaelteCard = null;
 let targetField = null;
 let cardclickstate = 0;
 let ausgewaelteCardSelected = false;
+
+
 
 cardDOM[0].addEventListener("click", function () {
     if (cardclickstate == 0) {
@@ -279,10 +326,11 @@ triggercardDOM[6].addEventListener("click", function () {
         targetField = 6;
         CardTriedToPlace();
     }
-})
+    })
 
 
 function CardAngeklickt() {
+
     if(cards[ausgewaelteCard].CardID != null) {
 
         CardMoving();
@@ -315,25 +363,44 @@ function CardMoving() {
     });
 }
 
+function CardTriedToPlace() {
+    let payLoad = {
+        "method": "cardMove",
+        "ausgewaehlteCard": ausgewaelteCard,
+        "targetCard": targetField
+    }
 
-//LETZTE FUNCTION NOCH EINFÜGEN TIM!!!
-// IST HALT BISSCHEN AUFWENDIG
+    sendMessage(ws, JSON.stringify(payLoad))
+}
 
+function CardReset() {
+    ausgewaelteCardSelected = false;
+    document.getElementById('cardPlace' + ausgewaelteCard).style.zIndex = "1";
+    document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('left');
+    document.getElementById('cardPlace' + ausgewaelteCard).style.removeProperty('top');
+    document.getElementById('cardPlace' + ausgewaelteCard).style.pointerEvents = "all";
+    cardclickstate = 0;
 
-
-
-//_________
-
-
-
-
-
-
-
+}
 
 function startGame() {
     let payLoad = {
         "method": "startGame"
     }
     sendMessage(ws, JSON.stringify(payLoad))
+}
+
+function finishRound() {
+    let payLoad = {
+        "method": "finishRound"
+    }
+    sendMessage(ws, JSON.stringify(payLoad))
+}
+
+
+function resetPlayerAmZug() {
+    clients.forEach(c => {
+        document.getElementById(c).style.background = "blue";
+        document.getElementById(c).style.color = "white";
+    })
 }

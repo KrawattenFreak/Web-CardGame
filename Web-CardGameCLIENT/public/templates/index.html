@@ -104,10 +104,27 @@
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 
+    failed.style.display = "none"
+
     if (urlParams.has("error") == true) {
+        failed.style.display = "block"
         failed.innerHTML = "Da haste reingeschissen. Es gibt kein Spiel mit der GameID: " + urlParams.get("error") + "."
     }
 
+    if (urlParams.has("errorSID") == true) {
+        failed.style.display = "block"
+        failed.innerHTML = "Junge du hast noch mehr reingeschisse. Es gibt keinen Spieler mit der SID: " + urlParams.get("errorSID") + "."
+    }
+
+    if (urlParams.has("errorGameStarted") == true) {
+        failed.style.display = "block"
+        failed.innerHTML = "Oke bre, das Spiel hat schon gestartet."
+    }
+
+    if (urlParams.has("errorAnotherSession") == true) {
+        failed.style.display = "block"
+        failed.innerHTML = "ha ha. Jemand hat deine SicherheitsID benutzt und deine Session damit ersetzt, du wurdest ersetzt!!"
+    }
 
 
     //----------------------
